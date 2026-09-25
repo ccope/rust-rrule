@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A BYDAY ordinal that is not an integer (`-.MO`, `1MOL1TU`, `33331TU`) is a
   parse error; it used to be read as 0, so the rule silently meant every such
   weekday.
+- Iteration stops once a period starts after UNTIL. A rule that had stopped
+  matching (`BYDAY=9SU;BYMONTH=4`) used to walk on to the end of the year range
+  before ending, up to a second or more per expansion.
 - A DTSTART whose year is outside -9998..=9998 fails validation, and iterating
   a rule from such a DTSTART (possible by pairing an `RRule` validated against
   one start with an `RRuleSet` built on another) yields nothing instead of

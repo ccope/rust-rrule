@@ -4,7 +4,7 @@ use super::{build_pos_list, utils::date_from_ordinal, IterInfo, MAX_ITER_LOOP};
 use crate::core::{get_hour, get_minute, get_second};
 use crate::validator::YEAR_RANGE;
 use crate::{Frequency, RRule};
-use jiff::civil::Time;
+use jiff::civil::{Date, Time};
 use jiff::tz::TimeZone;
 use jiff::Zoned;
 use std::collections::VecDeque;
@@ -205,10 +205,50 @@ impl RRuleIter {
             }
 
             self.ii.rebuild(&self.counter_date);
+
+            if self.period_starts_after_until() {
+                self.finished = true;
+                return true;
+            }
         }
 
         // Indicate that there might be more items on the next iteration.
         false
+    }
+}
+
+impl RRuleIter {
+    /// Whether nothing in the counter's current period can be at or before UNTIL.
+    ///
+    /// Candidates are otherwise only compared with UNTIL once generated, so a rule
+    /// that has stopped matching would walk on to the end of the year range.
+    fn period_starts_after_until(&self) -> bool {
+        let rrule = self.ii.rrule();
+        let Some(until) = &rrule.until else {
+            return false;
+        };
+        let c = &self.counter_date;
+        // The period's first day: yearly and monthly periods cover the whole year
+        // or month; the others start at the counter day.
+        let (month, day) = match rrule.freq {
+            Frequency::Yearly => (1, 1),
+            Frequency::Monthly => (c.month, 1),
+            _ => (c.month, c.day),
+        };
+        let first_day = (|| {
+            Date::new(
+                i16::try_from(c.year).ok()?,
+                i8::try_from(month).ok()?,
+                i8::try_from(day).ok()?,
+            )
+            .ok()?
+            // A day early, so no UTC offset can put the period's first instant before it.
+            .yesterday()
+            .ok()
+        })();
+        first_day
+            .and_then(|d| add_time_to_date(self.dt_start.time_zone(), d, Time::midnight()))
+            .is_some_and(|earliest| earliest > *until)
     }
 }
 

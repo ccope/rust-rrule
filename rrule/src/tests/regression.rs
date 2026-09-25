@@ -140,3 +140,19 @@ fn byday_with_a_malformed_ordinal_is_a_parse_error() {
         );
     }
 }
+
+// Found by AFL: a rule that stops matching (there is no 9th Sunday in April) ran on
+// to the iteration guard, far past its UNTIL, because UNTIL was only checked
+// against generated occurrences.
+#[test]
+fn until_ends_iteration_even_when_nothing_matches() {
+    let set = "DTSTART:20060416\nRRULE:FREQ=YEARLY;UNTIL=20070405;BYDAY=9SU;BYMONTH=4"
+        .parse::<RRuleSet>()
+        .unwrap();
+    let started = std::time::Instant::now();
+    assert!(set.all(50).dates.is_empty());
+    // Without the UNTIL check this walks ~8000 years to the end of the year range,
+    // taking seconds in a debug build; with it, one year.
+    let elapsed = started.elapsed();
+    assert!(elapsed.as_millis() < 250, "took {elapsed:?}");
+}
