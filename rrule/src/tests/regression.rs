@@ -120,3 +120,23 @@ fn iterating_near_the_ends_of_the_supported_range_does_not_panic() {
         }
     }
 }
+
+// An ordinal that is not a number used to be read as 0, i.e. "every", so
+// `33331TU` quietly meant every Tuesday.
+#[test]
+fn byday_with_a_malformed_ordinal_is_a_parse_error() {
+    for byday in ["-.MO", "2S=SU", "1MOL1TU", "33331TU", "1-MO", "--1MO"] {
+        let text = format!("DTSTART:20200101T090000Z\nRRULE:FREQ=MONTHLY;BYDAY={byday}");
+        assert!(
+            text.parse::<RRuleSet>().is_err(),
+            "BYDAY={byday} should not parse"
+        );
+    }
+    for byday in ["MO", "1MO", "+2TU", "-1FR", "5SU"] {
+        let text = format!("DTSTART:20200101T090000Z\nRRULE:FREQ=MONTHLY;BYDAY={byday}");
+        assert!(
+            text.parse::<RRuleSet>().is_ok(),
+            "BYDAY={byday} should parse"
+        );
+    }
+}

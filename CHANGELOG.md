@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - A BYDAY value containing a non-ASCII character is a parse error; it used to
   panic (`byte index is not a char boundary`).
+- A BYDAY ordinal that is not an integer (`-.MO`, `1MOL1TU`, `33331TU`) is a
+  parse error; it used to be read as 0, so the rule silently meant every such
+  weekday.
 - A DTSTART whose year is outside -9998..=9998 fails validation, and iterating
   a rule from such a DTSTART (possible by pairing an `RRule` validated against
   one start with an `RRuleSet` built on another) yields nothing instead of

@@ -161,7 +161,12 @@ impl FromStr for NWeekday {
 
         let wd = str_to_weekday(&value[(length - 2)..])
             .map_err(|_| ParseError::InvalidWeekday(value.into()))?;
-        let nth = value[..(length - 2)].parse::<i16>().unwrap_or_default();
+        let nth = match &value[..(length - 2)] {
+            "" => 0,
+            ordinal => ordinal
+                .parse::<i16>()
+                .map_err(|_| ParseError::InvalidWeekday(value.into()))?,
+        };
 
         if nth == 0 {
             Ok(Self::Every(wd))
