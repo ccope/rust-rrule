@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- A BYDAY value containing a non-ASCII character is a parse error; it used to
+  panic (`byte index is not a char boundary`).
+- A DTSTART whose year is outside -9998..=9998 fails validation, and iterating
+  a rule from such a DTSTART (possible by pairing an `RRule` validated against
+  one start with an `RRuleSet` built on another) yields nothing instead of
+  panicking. Near either end of the range, days that do not exist are skipped.
 - Dates are `jiff::Zoned` instead of `chrono::DateTime<rrule::Tz>`, and `chrono`
   and `chrono-tz` are no longer dependencies. `rrule::Tz` is gone; zones are
   `jiff::tz::TimeZone`, re-exported as `rrule::TimeZone` along with `Zoned` and

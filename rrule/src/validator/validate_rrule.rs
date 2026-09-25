@@ -17,7 +17,8 @@ pub(crate) static YEAR_RANGE: RangeInclusive<i32> = -9_998..=9_998;
 
 type Validator = &'static dyn Fn(&RRule<Unvalidated>, &Zoned) -> Result<(), ValidationError>;
 
-const VALIDATION_PIPELINE: [Validator; 11] = [
+const VALIDATION_PIPELINE: [Validator; 12] = [
+    &validate_dt_start,
     &validate_until,
     &validate_by_set_pos,
     &validate_by_month,
@@ -44,6 +45,22 @@ pub(crate) fn validate_rrule_forced(
     VALIDATION_PIPELINE
         .into_iter()
         .try_for_each(|validator| validator(rrule, dt_start))
+}
+
+// DTSTART:
+// - The year is within the range the iterators can build year tables for.
+fn validate_dt_start(_rrule: &RRule<Unvalidated>, dt_start: &Zoned) -> Result<(), ValidationError> {
+    let year = i32::from(dt_start.year());
+    if YEAR_RANGE.contains(&year) {
+        Ok(())
+    } else {
+        Err(ValidationError::InvalidFieldValueRange {
+            field: "DTSTART".into(),
+            value: year.to_string(),
+            start_idx: YEAR_RANGE.start().to_string(),
+            end_idx: YEAR_RANGE.end().to_string(),
+        })
+    }
 }
 
 // Until:

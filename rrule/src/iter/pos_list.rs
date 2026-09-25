@@ -46,7 +46,9 @@ pub(crate) fn build_pos_list(
             .expect("dayset is controlled by us and all elements are within range of i64");
 
         // Get ordinal which is UTC
-        let date = date_from_ordinal(year_ordinal + day);
+        let Some(date) = date_from_ordinal(year_ordinal + day) else {
+            continue;
+        };
         // Create new Date + Time combination
         // Use Time from `timeset`.
         let time = timeset[time_pos];

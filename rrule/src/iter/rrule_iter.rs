@@ -2,8 +2,10 @@ use super::counter_date::DateTimeIter;
 use super::utils::add_time_to_date;
 use super::{build_pos_list, utils::date_from_ordinal, IterInfo, MAX_ITER_LOOP};
 use crate::core::{get_hour, get_minute, get_second};
+use crate::validator::YEAR_RANGE;
 use crate::{Frequency, RRule};
 use jiff::civil::Time;
+use jiff::tz::TimeZone;
 use jiff::Zoned;
 use std::collections::VecDeque;
 
@@ -30,7 +32,15 @@ pub(crate) struct RRuleIter {
 
 impl RRuleIter {
     pub(crate) fn new(rrule: &RRule, dt_start: &Zoned, limited: bool) -> Self {
-        let ii = IterInfo::new(rrule, dt_start);
+        // A rule may be validated against one DTSTART and iterated from another.
+        // Outside the year range the year tables cannot be built, so there is
+        // nothing to generate; build them for a stand-in date and finish at once.
+        let in_range = YEAR_RANGE.contains(&i32::from(dt_start.year()));
+        let ii = if in_range {
+            IterInfo::new(rrule, dt_start)
+        } else {
+            IterInfo::new(rrule, &jiff::Timestamp::UNIX_EPOCH.to_zoned(TimeZone::UTC))
+        };
 
         let hour = get_hour(dt_start);
         let minute = get_minute(dt_start);
@@ -44,7 +54,7 @@ impl RRuleIter {
             timeset,
             dt_start: dt_start.clone(),
             buffer: VecDeque::new(),
-            finished: false,
+            finished: !in_range,
             count,
             limited,
             was_limited: false,
@@ -135,7 +145,10 @@ impl RRuleIter {
                     let year_ordinal = self.ii.year_ordinal();
                     // Ordinal conversion uses UTC: if we apply local-TZ here, then
                     // just below we'll end up double-applying.
-                    let date = date_from_ordinal(year_ordinal + current_day);
+                    // Past either end of jiff's date range there is no such day.
+                    let Some(date) = date_from_ordinal(year_ordinal + current_day) else {
+                        continue;
+                    };
                     for time in &self.timeset {
                         let Some(dt) = add_time_to_date(tz, date, *time) else {
                             continue;

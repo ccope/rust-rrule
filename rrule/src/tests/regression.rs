@@ -1,5 +1,5 @@
 use crate::tests::common;
-use crate::{Frequency, RRule, RRuleSet, Unvalidated};
+use crate::{Frequency, RRule, RRuleSet, Unvalidated, Weekday};
 
 #[test]
 fn issue_34() {
@@ -78,5 +78,45 @@ fn byday_with_multibyte_characters_is_a_parse_error() {
             text.parse::<RRuleSet>().is_err(),
             "BYDAY={byday} should not parse"
         );
+    }
+}
+
+// Jiff's last instant is 9999-12-30T22:00Z; a weekly iterator starting late in 9999
+// builds dates past it and must stop rather than panic.
+#[test]
+fn dtstart_at_the_end_of_the_year_range_is_rejected() {
+    let text = "DTSTART:99991225T000000Z\nRRULE:FREQ=WEEKLY;COUNT=3";
+    assert!(text.parse::<RRuleSet>().is_err());
+}
+
+#[test]
+fn iterating_near_the_ends_of_the_supported_range_does_not_panic() {
+    use jiff::tz::TimeZone;
+    let validated_at = common::ymd_hms(2020, 1, 1, 0, 0, 0);
+    let mut rules = vec![RRule::new(Frequency::Weekly).count(3)];
+    // BYWEEKNO looks at the previous year's weeks for some week starts only.
+    for wkst in [
+        Weekday::Monday,
+        Weekday::Tuesday,
+        Weekday::Wednesday,
+        Weekday::Thursday,
+        Weekday::Friday,
+        Weekday::Saturday,
+        Weekday::Sunday,
+    ] {
+        rules.push(
+            RRule::new(Frequency::Yearly)
+                .count(3)
+                .by_week_no(vec![1, 53])
+                .week_start(wkst),
+        );
+    }
+    for rule in rules {
+        let rule = rule.validate(validated_at.clone()).unwrap();
+        for start in [jiff::Timestamp::MAX, jiff::Timestamp::MIN] {
+            // The rule was validated against another DTSTART, which the API allows.
+            let set = RRuleSet::new(start.to_zoned(TimeZone::UTC)).rrule(rule.clone());
+            let _ = set.all(10);
+        }
     }
 }

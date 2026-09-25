@@ -2,25 +2,40 @@ use std::ops;
 
 use jiff::civil::{Date, Time};
 use jiff::tz::TimeZone;
-use jiff::{Timestamp, Zoned};
+use jiff::Zoned;
 
-const DAY_SECS: i64 = 24 * 60 * 60;
-
-/// Converts number of days since unix epoch to a (naive) date.
-pub(crate) fn date_from_ordinal(ordinal: i64) -> Date {
-    Timestamp::from_second(ordinal * DAY_SECS)
-        .expect("ordinals come from dates within jiff's supported range")
-        .to_zoned(TimeZone::UTC)
-        .date()
+/// The date `ordinal` days after 1970-01-01, or `None` outside jiff's date range.
+///
+/// Integer arithmetic (Hinnant's `civil_from_days`) rather than a timestamp, which
+/// covers fewer dates than `Date` does at both ends.
+pub(crate) fn date_from_ordinal(ordinal: i64) -> Option<Date> {
+    let z = ordinal + 719_468;
+    let era = z.div_euclid(146_097);
+    let doe = z.rem_euclid(146_097);
+    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let day = doy - (153 * mp + 2) / 5 + 1;
+    let month = if mp < 10 { mp + 3 } else { mp - 9 };
+    let year = yoe + era * 400 + i64::from(month <= 2);
+    Date::new(
+        i16::try_from(year).ok()?,
+        i8::try_from(month).ok()?,
+        i8::try_from(day).ok()?,
+    )
+    .ok()
 }
 
-/// Returns number of days since unix epoch (rounded down)
+/// Days from 1970-01-01 to `date` (Hinnant's `days_from_civil`); exact for every `Date`.
 pub(crate) fn days_since_unix_epoch(date: Date) -> i64 {
-    date.to_zoned(TimeZone::UTC)
-        .expect("a civil date at midnight UTC always exists")
-        .timestamp()
-        .as_second()
-        .div_euclid(DAY_SECS)
+    let (month, day) = (i64::from(date.month()), i64::from(date.day()));
+    let year = i64::from(date.year()) - i64::from(month <= 2);
+    let era = year.div_euclid(400);
+    let yoe = year.rem_euclid(400);
+    let mp = if month > 2 { month - 3 } else { month + 9 };
+    let doy = (153 * mp + 2) / 5 + day - 1;
+    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    era * 146_097 + doe - 719_468
 }
 
 /// Returns true if given year is a leap year
@@ -103,8 +118,27 @@ mod test {
         ];
 
         for (days, expected) in tests {
-            assert_eq!(date_from_ordinal(days), expected, "seconds: {}", days);
+            assert_eq!(date_from_ordinal(days), Some(expected), "days: {}", days);
         }
+    }
+
+    #[test]
+    fn ordinals_round_trip_across_the_whole_date_range() {
+        for date in [
+            jiff::civil::Date::MIN,
+            jiff::civil::date(-1, 2, 28),
+            jiff::civil::date(0, 2, 29),
+            jiff::civil::date(1900, 3, 1),
+            jiff::civil::date(2000, 2, 29),
+            jiff::civil::Date::MAX,
+        ] {
+            let ordinal = days_since_unix_epoch(date);
+            assert_eq!(date_from_ordinal(ordinal), Some(date), "{date}");
+        }
+        let past_max = days_since_unix_epoch(jiff::civil::Date::MAX) + 1;
+        let before_min = days_since_unix_epoch(jiff::civil::Date::MIN) - 1;
+        assert_eq!(date_from_ordinal(past_max), None);
+        assert_eq!(date_from_ordinal(before_min), None);
     }
 
     #[test]
