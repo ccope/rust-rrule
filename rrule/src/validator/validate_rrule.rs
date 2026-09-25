@@ -11,9 +11,10 @@ use super::ValidationError;
 /// Range: `1..=12`
 pub(crate) static MONTH_RANGE: RangeInclusive<u8> = 1..=12;
 
-/// Range of values that a year can be: one year inside jiff's `-9999..=9999`,
-/// since the iterators also build the neighbouring years.
-pub(crate) static YEAR_RANGE: RangeInclusive<i32> = -9_998..=9_998;
+/// Range of values that a year can be. The upper end stays one year inside jiff's
+/// `9999`, since the iterators also build the following year; years before 1 are
+/// outside what calendars use and what the parser and `Display` round-trip.
+pub(crate) static YEAR_RANGE: RangeInclusive<i32> = 1..=9_998;
 
 type Validator = &'static dyn Fn(&RRule<Unvalidated>, &Zoned) -> Result<(), ValidationError>;
 

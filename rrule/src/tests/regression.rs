@@ -156,3 +156,14 @@ fn until_ends_iteration_even_when_nothing_matches() {
     let elapsed = started.elapsed();
     assert!(elapsed.as_millis() < 250, "took {elapsed:?}");
 }
+
+#[test]
+fn dtstart_before_year_1_is_rejected() {
+    let rule = "RRULE:FREQ=YEARLY;COUNT=2";
+    assert!(format!("DTSTART:00001231T000000Z\n{rule}")
+        .parse::<RRuleSet>()
+        .is_err());
+    assert!(format!("DTSTART:00010101T000000Z\n{rule}")
+        .parse::<RRuleSet>()
+        .is_ok());
+}

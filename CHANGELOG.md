@@ -14,7 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Iteration stops once a period starts after UNTIL. A rule that had stopped
   matching (`BYDAY=9SU;BYMONTH=4`) used to walk on to the end of the year range
   before ending, up to a second or more per expansion.
-- A DTSTART whose year is outside -9998..=9998 fails validation, and iterating
+- A rule's DTSTART must be in years 1..=9998; earlier years fail validation.
+  Years before 1 were accepted but written back as `DTSTART:-6398...`, which
+  does not parse.
+- A DTSTART whose year is outside the supported range fails validation, and iterating
   a rule from such a DTSTART (possible by pairing an `RRule` validated against
   one start with an `RRuleSet` built on another) yields nothing instead of
   panicking. Near either end of the range, days that do not exist are skipped.
@@ -36,8 +39,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - RDATE, EXDATE and UNTIL values in a zone other than UTC are written back in
   UTC with a `Z`; they used to be written as their local time with a `Z`
   appended, which named a different instant.
-- The supported year range is -9998..=9998 (Jiff's range, less one year on
-  each side).
 - An instant produced more than once (an RDATE equal to a rule occurrence, or
   two rules meeting) is returned once, as RFC 5545 §3.8.5.2 defines the
   recurrence set (upstream #150).
