@@ -1,0 +1,1041 @@
+# Extracted from https://github.com/ical4j/ical4j/tree/0ff53a489cb5cd3e00bef42a76552d4143d37862
+#   src/test/groovy/net/fortuna/ical4j/model/RecurSpec.groovy
+#   src/test/java/net/fortuna/ical4j/model/RecurTest.java (hand-picked cases)
+# by extract/ical4j.py. Do not edit by hand.
+# SPDX-FileCopyrightText: 2012 Ben Fortuna
+# SPDX-License-Identifier: BSD-3-Clause
+# (see LICENSES/BSD-3-Clause.txt). Format: see README.md.
+#
+# ical4j Recur.getDates(seed, periodStart, periodEnd): DTSTART = seed; WINDOW is
+# [periodStart, periodEnd] inclusive at both ends; the seed is an instance only if
+# the rule generates it; COUNT counts from the seed, including instances before
+# the window. getDates(start, end) uses start as the seed. Floating values
+# (LocalDate/LocalDateTime) are run in TZ:UTC; a DATE UNTIL means 00:00 that day.
+
+CASE:RecurSpec.groovy#verify recurrence rule: #rule [0]
+TZ:UTC
+DTSTART:20110101T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;BYDAY=MO
+WINDOW:20110101T000000/20110201T000000
+INSTANCES-AS:local
+INSTANCES:20110103T000000,20110110T000000,20110117T000000,20110124T000000,20110131T000000
+
+CASE:RecurSpec.groovy#verify recurrence rule: #rule [1]
+TZ:UTC
+DTSTART:20181011
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=DAILY;INTERVAL=14;WKST=MO;BYMONTH=10,12
+WINDOW:20181011/20181231
+INSTANCES-AS:local
+INSTANCES:20181011,20181025,20181206,20181220
+
+CASE:RecurSpec.groovy#verify recurrence rule: #rule [2]
+TZ:UTC
+DTSTART:20160325T110500
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;BYDAY=MO,TH,FR,SA,SU;BYHOUR=11;BYMINUTE=5
+WINDOW:20160325T110500/20160329T121000
+INSTANCES-AS:local
+INSTANCES:20160325T110500,20160326T110500,20160327T110500,20160328T110500
+
+CASE:RecurSpec.groovy#verify recurrence rule: #rule [3]
+TZ:UTC
+DTSTART:20160727T003000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=FR;WKST=MO;UNTIL=20170127T003000
+WINDOW:20160727T003000/20170127T003000
+INSTANCES-AS:local
+INSTANCES:20160729T003000,20160805T003000,20160812T003000,20160819T003000,20160826T003000,20160902T003000,20160909T003000,20160916T003000,20160923T003000,20160930T003000,20161007T003000,20161014T003000,20161021T003000,20161028T003000,20161104T003000,20161111T003000,20161118T003000,20161125T003000,20161202T003000,20161209T003000,20161216T003000,20161223T003000,20161230T003000,20170106T003000,20170113T003000,20170120T003000,20170127T003000
+
+CASE:RecurSpec.groovy#verify recurrence rule: #rule [4]
+TZ:UTC
+DTSTART:20181020T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;WKST=MO;BYDAY=SU;BYHOUR=0;BYMINUTE=0
+WINDOW:20181020T000000/20181120T000000
+INSTANCES-AS:local
+INSTANCES:20181021T000000,20181028T000000,20181104T000000,20181111T000000,20181118T000000
+
+CASE:RecurSpec.groovy#verify recurrence rule: #rule [5]
+TZ:UTC
+DTSTART:20000101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=DAILY;BYMONTH=1
+WINDOW:20000101/20000201
+INSTANCES-AS:local
+INSTANCES:20000101,20000102,20000103,20000104,20000105,20000106,20000107,20000108,20000109,20000110,20000111,20000112,20000113,20000114,20000115,20000116,20000117,20000118,20000119,20000120,20000121,20000122,20000123,20000124,20000125,20000126,20000127,20000128,20000129,20000130,20000131
+
+CASE:RecurSpec.groovy#verify recurrence rule: #rule [6]
+TZ:UTC
+DTSTART:20150101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;WKST=MO;INTERVAL=1;BYMONTH=2,3,9,10;BYMONTHDAY=28,29,30,31;BYSETPOS=-1
+WINDOW:20150101/20170101
+INSTANCES-AS:local
+INSTANCES:20150228,20150331,20150930,20151031,20160229,20160331,20160930,20161031
+
+CASE:RecurSpec.groovy#verify recurrence rule: #rule [7]
+TZ:UTC
+DTSTART:20130831
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=DAILY;UNTIL=20130906
+WINDOW:20130831/20200110
+INSTANCES-AS:local
+INSTANCES:20130831,20130901,20130902,20130903,20130904,20130905,20130906
+
+CASE:RecurSpec.groovy#verify recurrence rule: #rule [8]
+TZ:UTC
+DTSTART:20250131
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;COUNT=10;INTERVAL=1;BYDAY=-1FR
+WINDOW:20250131/20260131
+INSTANCES-AS:local
+INSTANCES:20250131,20250228,20250328,20250425,20250530,20250627,20250725,20250829,20250926,20251031
+
+CASE:RecurSpec.groovy#verify recurrence rule: #rule [9]
+TZ:UTC
+DTSTART:20250131T020000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;COUNT=10;INTERVAL=1;BYDAY=-1FR
+WINDOW:20250131T020000/20260131T020000
+INSTANCES-AS:local
+INSTANCES:20250131T020000,20250228T020000,20250328T020000,20250425T020000,20250530T020000,20250627T020000,20250725T020000,20250829T020000,20250926T020000,20251031T020000
+
+CASE:RecurSpec.groovy#verify recurrence rule: #rule [10]
+TZ:UTC
+DTSTART:20260101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=DAILY;BYMONTH=1;BYMONTHDAY=-2
+WINDOW:20260101/20261231
+INSTANCES-AS:local
+INSTANCES:20260130
+
+CASE:RecurSpec.groovy#verify byweekno recurrence rules without byday: #rule wkst: #wkst [0]
+TZ:UTC
+DTSTART:20110108
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYWEEKNO=1,52;WKST=MO
+WINDOW:20110108/20131231
+INSTANCES-AS:local
+INSTANCES:20110108,20111231,20120107,20121229,20130105,20131228
+
+CASE:RecurSpec.groovy#verify byweekno recurrence rules without byday: #rule wkst: #wkst [1]
+TZ:UTC
+DTSTART:20110101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYWEEKNO=1,52,53;WKST=WE
+WINDOW:20110101/20131231
+INSTANCES-AS:local
+INSTANCES:20110101,20111224,20111231,20120107,20121229,20130105,20131228
+
+CASE:RecurSpec.groovy#verify byweekno recurrence rules without byday: #rule wkst: #wkst [2]
+TZ:UTC
+DTSTART:20110108
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYWEEKNO=2,52,53;WKST=WE
+WINDOW:20110108/20131231
+INSTANCES-AS:local
+INSTANCES:20110108,20111224,20111231,20120114,20121229,20130112,20131228
+
+CASE:RecurSpec.groovy#verify byweekno recurrence rules without byday: #rule wkst: #wkst [3]
+TZ:UTC
+DTSTART:20110108
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYWEEKNO=-52,-1;WKST=MO
+WINDOW:20110108/20131231
+INSTANCES-AS:local
+INSTANCES:20110108,20111231,20120107,20121229,20130105,20131228
+
+CASE:RecurSpec.groovy#verify byweekno recurrence rules without byday: #rule wkst: #wkst [4]
+TZ:UTC
+DTSTART:20110101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYWEEKNO=-53,-2,-1;WKST=WE
+WINDOW:20110101/20131231
+INSTANCES-AS:local
+INSTANCES:20110101,20111224,20111231,20121222,20121229,20131221,20131228
+
+CASE:RecurSpec.groovy#verify byweekno recurrence rules without byday: #rule wkst: #wkst [5]
+TZ:UTC
+DTSTART:20110108
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYWEEKNO=-52,-2,-1;WKST=WE
+WINDOW:20110108/20131231
+INSTANCES-AS:local
+INSTANCES:20110108,20111224,20111231,20120107,20121222,20121229,20130105,20131221,20131228
+
+CASE:RecurSpec.groovy#verify byweekno recurrence rules: #rule wkst: #wkst byday: #byday [0]
+TZ:UTC
+DTSTART:20110110
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYWEEKNO=2,52,53;WKST=MO;BYDAY=MO,TH
+WINDOW:20110110/20131231
+INSTANCES-AS:local
+INSTANCES:20110110,20110113,20111226,20111229,20120109,20120112,20121224,20121227,20130107,20130110,20131223,20131226
+
+CASE:RecurSpec.groovy#verify byweekno recurrence rules: #rule wkst: #wkst byday: #byday [1]
+TZ:UTC
+DTSTART:20110106
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYWEEKNO=2,52,53;WKST=WE;BYDAY=TH,MO
+WINDOW:20110106/20131231
+INSTANCES-AS:local
+INSTANCES:20110106,20110110,20111222,20111226,20111229,20120102,20120112,20120116,20121227,20121231,20130110,20130114,20131226,20131230
+
+CASE:RecurSpec.groovy#verify monthly bymonthday recurrence rules: #rule #year [0]
+TZ:UTC
+DTSTART:20110101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYMONTHDAY=2,29,30,31
+WINDOW:20110101/20110503
+INSTANCES-AS:local
+INSTANCES:20110102,20110129,20110130,20110131,20110202,20110302,20110329,20110330,20110331,20110402,20110429,20110430,20110502
+
+CASE:RecurSpec.groovy#verify monthly bymonthday recurrence rules: #rule #year [1]
+TZ:UTC
+DTSTART:20120101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYMONTHDAY=2,29,30,31
+WINDOW:20120101/20120503
+INSTANCES-AS:local
+INSTANCES:20120102,20120129,20120130,20120131,20120202,20120229,20120302,20120329,20120330,20120331,20120402,20120429,20120430,20120502
+
+CASE:RecurSpec.groovy#verify monthly bymonthday recurrence rules: #rule #year [2]
+TZ:UTC
+DTSTART:20110101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYMONTHDAY=-2,-29,-30,-31
+WINDOW:20110101/20110503
+INSTANCES-AS:local
+INSTANCES:20110101,20110102,20110103,20110130,20110227,20110301,20110302,20110303,20110330,20110401,20110402,20110429,20110501,20110502,20110503
+
+CASE:RecurSpec.groovy#verify monthly bymonthday recurrence rules: #rule #year [3]
+TZ:UTC
+DTSTART:20120101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYMONTHDAY=-2,-29,-30,-31
+WINDOW:20120101/20120503
+INSTANCES-AS:local
+INSTANCES:20120101,20120102,20120103,20120130,20120201,20120228,20120301,20120302,20120303,20120330,20120401,20120402,20120429,20120501,20120502,20120503
+
+CASE:RecurSpec.groovy#verify monthly bymonthday recurrence rules: #rule #year [4]
+TZ:UTC
+DTSTART:20200131
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYMONTHDAY=-1
+WINDOW:20200131/20200531
+INSTANCES-AS:local
+INSTANCES:20200131,20200229,20200331,20200430,20200531
+
+CASE:RecurSpec.groovy#verify monthly bymonthday recurrence rules: #rule #year [5]
+TZ:UTC
+DTSTART:20190131
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYMONTHDAY=-1
+WINDOW:20190131/20190531
+INSTANCES-AS:local
+INSTANCES:20190131,20190228,20190331,20190430,20190531
+
+CASE:RecurSpec.groovy#verify monthly bymonthday recurrence rules: #rule #year [6]
+TZ:UTC
+DTSTART:20200131
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYMONTHDAY=28,29,30,31;BYSETPOS=-1
+WINDOW:20200131/20200531
+INSTANCES-AS:local
+INSTANCES:20200131,20200229,20200331,20200430,20200531
+
+CASE:RecurSpec.groovy#verify monthly bymonthday recurrence rules: #rule #year [7]
+TZ:UTC
+DTSTART:20190131
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYMONTHDAY=28,29,30,31;BYSETPOS=-1
+WINDOW:20190131/20190531
+INSTANCES-AS:local
+INSTANCES:20190131,20190228,20190331,20190430,20190531
+
+CASE:RecurSpec.groovy#verify monthly bymonthday recurrence rules: #rule #year [8]
+TZ:UTC
+DTSTART:20200131
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYMONTHDAY=31
+WINDOW:20200131/20200531
+INSTANCES-AS:local
+INSTANCES:20200131,20200331,20200531
+
+CASE:RecurSpec.groovy#verify yearly bymonthday recurrence rules: #rule #start [0]
+TZ:UTC
+DTSTART:20110101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYMONTHDAY=2,-1
+WINDOW:20110101/20121231
+INSTANCES-AS:local
+INSTANCES:20110102,20110131,20120102,20120131
+
+CASE:RecurSpec.groovy#verify yearly bymonthday recurrence rules: #rule #start [1]
+TZ:UTC
+DTSTART:20110201
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYMONTHDAY=2,-1
+WINDOW:20110201/20121231
+INSTANCES-AS:local
+INSTANCES:20110202,20110228,20120202,20120229
+
+CASE:RecurSpec.groovy#verify byyearday recurrence rules: #rule [0]
+TZ:UTC
+DTSTART:20110101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYYEARDAY=2,365,366
+WINDOW:20110101/20131231
+INSTANCES-AS:local
+INSTANCES:20110102,20111231,20120102,20121230,20121231,20130102,20131231
+
+CASE:RecurSpec.groovy#verify byyearday recurrence rules: #rule [1]
+TZ:UTC
+DTSTART:20110101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYYEARDAY=-1,-365,-366
+WINDOW:20110101/20131231
+INSTANCES-AS:local
+INSTANCES:20110101,20111231,20120101,20120102,20121231,20130101,20131231
+
+CASE:RecurSpec.groovy#verify byyearday recurrence rules: #rule [2]
+TZ:UTC
+DTSTART:20110101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYYEARDAY=2,32
+WINDOW:20110101/20131231
+INSTANCES-AS:local
+INSTANCES:20110102,20110201,20120102,20120201,20130102,20130201
+
+# Upstream runs this with Locale.FRANCE.
+CASE:RecurSpec.groovy#verify recurrence rule in different locales: #rule
+TZ:UTC
+DTSTART:20110101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;BYDAY=MO
+WINDOW:20110101/20110201
+INSTANCES-AS:local
+INSTANCES:20110103,20110110,20110117,20110124,20110131
+
+CASE:RecurSpec.groovy#verify recurrence rule with a specified interval: #rule [0]
+TZ:UTC
+DTSTART:20110102
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=SU
+WINDOW:20110102/20110201
+INSTANCES-AS:local
+INSTANCES:20110102,20110116,20110130
+
+CASE:RecurSpec.groovy#verify recurrence rule with a specified interval: #rule [1]
+TZ:UTC
+DTSTART:20101226
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=SU
+WINDOW:20101226/20110201
+INSTANCES-AS:local
+INSTANCES:20101226,20110109,20110123
+
+CASE:RecurSpec.groovy#verify recurrence rule with a specified WKST: #rule [0]
+TZ:UTC
+DTSTART:20110101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=SU;WKST=SU
+WINDOW:20110101/20110201
+INSTANCES-AS:local
+INSTANCES:20110109,20110123
+
+CASE:RecurSpec.groovy#verify recurrence rule with a specified WKST: #rule [1]
+TZ:UTC
+DTSTART:20110306
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=SU,MO;WKST=MO
+WINDOW:20110306/20110313
+INSTANCES-AS:local
+INSTANCES:20110306
+
+CASE:RecurSpec.groovy#verify recurrence rule with a specified WKST: #rule [2]
+TZ:UTC
+DTSTART:20110306
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=SU,MO;WKST=SU
+WINDOW:20110306/20110313
+INSTANCES-AS:local
+INSTANCES:20110306,20110307
+
+# Upstream runs this with Locale.FRANCE.
+CASE:RecurSpec.groovy#verify recurrence rule in different locales with a specified interval: #rule
+TZ:UTC
+DTSTART:20110101
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=SU
+WINDOW:20110101/20110201
+INSTANCES-AS:local
+INSTANCES:20110102,20110116,20110130
+
+# Upstream JVM default time zone: Europe/Berlin (values are Europe/Berlin).
+CASE:RecurSpec.groovy#verify recurrence rule in different system timezones: #systemTimezone [0]
+TZ:Europe/Berlin
+DTSTART:20161029T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;BYHOUR=0;BYMINUTE=5
+WINDOW:20161029T000000/20161102T000000
+INSTANCES-AS:local
+INSTANCES:20161029T000500,20161030T000500,20161031T000500,20161101T000500
+
+# Upstream JVM default time zone: America/Phoenix (values are Europe/Berlin).
+CASE:RecurSpec.groovy#verify recurrence rule in different system timezones: #systemTimezone [1]
+TZ:Europe/Berlin
+DTSTART:20161029T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;BYHOUR=0;BYMINUTE=5
+WINDOW:20161029T000000/20161102T000000
+INSTANCES-AS:local
+INSTANCES:20161029T000500,20161030T000500,20161031T000500,20161101T000500
+
+# Upstream JVM default time zone: America/St_Johns (values are Europe/Berlin).
+CASE:RecurSpec.groovy#verify recurrence rule in different system timezones: #systemTimezone [2]
+TZ:Europe/Berlin
+DTSTART:20161029T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;BYHOUR=0;BYMINUTE=5
+WINDOW:20161029T000000/20161102T000000
+INSTANCES-AS:local
+INSTANCES:20161029T000500,20161030T000500,20161031T000500,20161101T000500
+
+# Upstream JVM default time zone: Africa/Johannesburg (values are Europe/Berlin).
+CASE:RecurSpec.groovy#verify recurrence rule in different system timezones: #systemTimezone [3]
+TZ:Europe/Berlin
+DTSTART:20161029T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;BYHOUR=0;BYMINUTE=5
+WINDOW:20161029T000000/20161102T000000
+INSTANCES-AS:local
+INSTANCES:20161029T000500,20161030T000500,20161031T000500,20161101T000500
+
+# Upstream JVM default time zone: America/New_York (values are Europe/Berlin).
+CASE:RecurSpec.groovy#verify recurrence rule in different system timezones: #systemTimezone [4]
+TZ:Europe/Berlin
+DTSTART:19970512T090000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYWEEKNO=20;BYDAY=MO
+WINDOW:19970512T090000/20000512T090000
+INSTANCES-AS:local
+INSTANCES:19970512T090000,19980511T090000,19990517T090000
+
+# Expected = the canonical rule's instances (upstream also checks getNextDate).
+CASE:RecurSpec.groovy#duplicate candidates do not consume count positions: #repeated [0]
+TZ:UTC
+DTSTART:20080115T090000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;BYDAY=TU,TH,TU;COUNT=12
+WINDOW:20080115T090000Z/20280115T090000Z
+INSTANCES-AS:utc-z
+COUNT:12
+SAME-AS:FREQ=WEEKLY;BYDAY=TU,TH;COUNT=12
+
+# Expected = the canonical rule's instances (upstream also checks getNextDate).
+CASE:RecurSpec.groovy#duplicate candidates do not consume count positions: #repeated [1]
+TZ:UTC
+DTSTART:20080115T090000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYDAY=TU,1TU;COUNT=12
+WINDOW:20080115T090000Z/20280115T090000Z
+INSTANCES-AS:utc-z
+COUNT:12
+SAME-AS:FREQ=MONTHLY;BYDAY=TU;COUNT=12
+
+# Expected = the canonical rule's instances (upstream also checks getNextDate).
+CASE:RecurSpec.groovy#duplicate candidates do not consume count positions: #repeated [2]
+TZ:UTC
+DTSTART:20080115T090000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYMONTHDAY=1,1,15;COUNT=12
+WINDOW:20080115T090000Z/20280115T090000Z
+INSTANCES-AS:utc-z
+COUNT:12
+SAME-AS:FREQ=MONTHLY;BYMONTHDAY=1,15;COUNT=12
+
+# Expected = the canonical rule's instances (upstream also checks getNextDate).
+CASE:RecurSpec.groovy#duplicate candidates do not consume count positions: #repeated [3]
+TZ:UTC
+DTSTART:20080115T090000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYMONTH=1,1,2;COUNT=12
+WINDOW:20080115T090000Z/20280115T090000Z
+INSTANCES-AS:utc-z
+COUNT:12
+SAME-AS:FREQ=YEARLY;BYMONTH=1,2;COUNT=12
+
+# Expected = the canonical rule's instances (upstream also checks getNextDate).
+CASE:RecurSpec.groovy#duplicate candidates do not consume count positions: #repeated [4]
+TZ:UTC
+DTSTART:20080115T090000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYWEEKNO=3,3;BYDAY=TU;COUNT=12
+WINDOW:20080115T090000Z/20280115T090000Z
+INSTANCES-AS:utc-z
+COUNT:12
+SAME-AS:FREQ=YEARLY;BYWEEKNO=3;BYDAY=TU;COUNT=12
+
+# Expected = the canonical rule's instances (upstream also checks getNextDate).
+CASE:RecurSpec.groovy#duplicate candidates do not consume count positions: #repeated [5]
+TZ:UTC
+DTSTART:20080115T090000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYYEARDAY=15,15,16;COUNT=12
+WINDOW:20080115T090000Z/20280115T090000Z
+INSTANCES-AS:utc-z
+COUNT:12
+SAME-AS:FREQ=YEARLY;BYYEARDAY=15,16;COUNT=12
+
+# Expected = the canonical rule's instances (upstream also checks getNextDate).
+CASE:RecurSpec.groovy#duplicate candidates do not consume count positions: #repeated [6]
+TZ:UTC
+DTSTART:20080115T090000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=DAILY;BYHOUR=9,9,10;COUNT=12
+WINDOW:20080115T090000Z/20280115T090000Z
+INSTANCES-AS:utc-z
+COUNT:12
+SAME-AS:FREQ=DAILY;BYHOUR=9,10;COUNT=12
+
+# Expected = the canonical rule's instances (upstream also checks getNextDate).
+CASE:RecurSpec.groovy#duplicate candidates do not consume count positions: #repeated [7]
+TZ:UTC
+DTSTART:20080115T090000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=HOURLY;BYMINUTE=0,0,15;COUNT=12
+WINDOW:20080115T090000Z/20280115T090000Z
+INSTANCES-AS:utc-z
+COUNT:12
+SAME-AS:FREQ=HOURLY;BYMINUTE=0,15;COUNT=12
+
+# Expected = the canonical rule's instances (upstream also checks getNextDate).
+CASE:RecurSpec.groovy#duplicate candidates do not consume count positions: #repeated [8]
+TZ:UTC
+DTSTART:20080115T090000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MINUTELY;BYSECOND=0,0,15;COUNT=12
+WINDOW:20080115T090000Z/20280115T090000Z
+INSTANCES-AS:utc-z
+COUNT:12
+SAME-AS:FREQ=MINUTELY;BYSECOND=0,15;COUNT=12
+
+# Expected = the canonical rule's instances (upstream also checks getNextDate).
+CASE:RecurSpec.groovy#duplicate candidates do not consume count positions: #repeated [9]
+TZ:UTC
+DTSTART:20080115T090000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;BYDAY=TU,TH,TU;BYSETPOS=2;COUNT=12
+WINDOW:20080115T090000Z/20280115T090000Z
+INSTANCES-AS:utc-z
+COUNT:12
+SAME-AS:FREQ=WEEKLY;BYDAY=TU,TH;BYSETPOS=2;COUNT=12
+
+# Expected = the canonical rule's instances (upstream also checks getNextDate).
+CASE:RecurSpec.groovy#duplicate candidates do not consume count positions: #repeated [10]
+TZ:UTC
+DTSTART:20080115T090000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;BYDAY=TU,TH,TU;BYSETPOS=-2;COUNT=12
+WINDOW:20080115T090000Z/20280115T090000Z
+INSTANCES-AS:utc-z
+COUNT:12
+SAME-AS:FREQ=WEEKLY;BYDAY=TU,TH;BYSETPOS=-2;COUNT=12
+
+# Expected = the canonical rule's instances (upstream also checks getNextDate).
+CASE:RecurSpec.groovy#duplicate candidates do not consume count positions: #repeated [11]
+TZ:UTC
+DTSTART:20080115T090000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;BYDAY=TU,TH;BYSETPOS=1,1,2;COUNT=12
+WINDOW:20080115T090000Z/20280115T090000Z
+INSTANCES-AS:utc-z
+COUNT:12
+SAME-AS:FREQ=WEEKLY;BYDAY=TU,TH;BYSETPOS=1,2;COUNT=12
+
+# Expected = the canonical rule's instances (upstream also checks getNextDate).
+CASE:RecurSpec.groovy#duplicate candidates do not consume count positions: #repeated [12]
+TZ:UTC
+DTSTART:20080115T090000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;BYDAY=TU,TH;BYSETPOS=1,-2;COUNT=12
+WINDOW:20080115T090000Z/20280115T090000Z
+INSTANCES-AS:utc-z
+COUNT:12
+SAME-AS:FREQ=WEEKLY;BYDAY=TU,TH;BYSETPOS=1;COUNT=12
+
+# getNextDate(seed, start): first instance strictly after start.
+CASE:RecurSpec.groovy#test Recur.getNextDate() with different recurrence rules [0]
+TZ:UTC
+DTSTART:20180329T025959
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;COUNT=100;INTERVAL=1
+AFTER:20170729T030000
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:20180329T025959
+MORE:any
+
+# getNextDate(seed, start): first instance strictly after start.
+CASE:RecurSpec.groovy#test Recur.getNextDate() with different recurrence rules [1]
+TZ:UTC
+DTSTART:20250323T111500
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;UNTIL=20260714T063000;INTERVAL=1;BYDAY=FR,SA
+AFTER:20250325T111500
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:20250328T111500
+MORE:any
+
+# Upstream JVM default time zone: UTC.
+CASE:RecurSpec.groovy#verify yearly recurrence with UTC start date in system timezone: #systemTimezone [0]
+TZ:UTC
+DTSTART:20250302T000000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;INTERVAL=1
+WINDOW:20250101T000000Z/20251231T000000Z
+INSTANCES-AS:utc-z
+INSTANCES:20250302T000000Z
+
+# Upstream JVM default time zone: America/New_York.
+CASE:RecurSpec.groovy#verify yearly recurrence with UTC start date in system timezone: #systemTimezone [1]
+TZ:UTC
+DTSTART:20250302T000000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;INTERVAL=1
+WINDOW:20250101T000000Z/20251231T000000Z
+INSTANCES-AS:utc-z
+INSTANCES:20250302T000000Z
+
+# Upstream JVM default time zone: America/Los_Angeles.
+CASE:RecurSpec.groovy#verify yearly recurrence with UTC start date in system timezone: #systemTimezone [2]
+TZ:UTC
+DTSTART:20250302T000000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;INTERVAL=1
+WINDOW:20250101T000000Z/20251231T000000Z
+INSTANCES-AS:utc-z
+INSTANCES:20250302T000000Z
+
+# Upstream JVM default time zone: Asia/Kolkata.
+CASE:RecurSpec.groovy#verify yearly recurrence with UTC start date in system timezone: #systemTimezone [3]
+TZ:UTC
+DTSTART:20250302T000000Z
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;INTERVAL=1
+WINDOW:20250101T000000Z/20251231T000000Z
+INSTANCES-AS:utc-z
+INSTANCES:20250302T000000Z
+
+CASE:RecurSpec.groovy#test getdates across a DST-change both ways [0]
+TZ:America/Los_Angeles
+DTSTART:20250305T050000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=DAILY;COUNT=10;INTERVAL=1
+WINDOW:20250305T050000/20250314T050000
+INSTANCES-AS:local-offset
+INSTANCES:20250305T050000-0800,20250306T050000-0800,20250307T050000-0800,20250308T050000-0800,20250309T050000-0700,20250310T050000-0700,20250311T050000-0700,20250312T050000-0700,20250313T050000-0700,20250314T050000-0700
+
+CASE:RecurSpec.groovy#test getdates across a DST-change both ways [1]
+TZ:America/Los_Angeles
+DTSTART:20250305T020000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=DAILY;COUNT=10;INTERVAL=1
+WINDOW:20250305T020000/20250314T020000
+INSTANCES-AS:local-offset
+INSTANCES:20250305T020000-0800,20250306T020000-0800,20250307T020000-0800,20250308T020000-0800,20250309T030000-0700,20250310T020000-0700,20250311T020000-0700,20250312T020000-0700,20250313T020000-0700,20250314T020000-0700
+
+# Rule text is what upstream's Recur.Builder chain produces (frequency, interval, dayList, hourList, minuteList, until).
+CASE:RecurSpec.groovy#test BYDAY with MINUTELY precision
+TZ:UTC
+DTSTART:20220505T143700
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=DAILY;INTERVAL=1;BYDAY=MO;BYHOUR=16;BYMINUTE=37,38;UNTIL=20220519T165900
+WINDOW:20220505T143700/20220519T145900
+INSTANCES-AS:local
+INSTANCES:20220509T163700,20220509T163800,20220516T163700,20220516T163800
+
+# Rule text is what upstream's Recur.Builder chain produces (frequency, interval, dayList, hourList, minuteList, until).
+CASE:RecurSpec.groovy#test getdates as stream
+TZ:UTC
+DTSTART:20220505T143700
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=DAILY;INTERVAL=1;BYDAY=MO;BYHOUR=16;BYMINUTE=37,38;UNTIL=20220519T165900
+WINDOW:20220505T143700/20220519T145900
+INSTANCES-AS:local
+INSTANCES:20220509T163700,20220509T163800,20220516T163700,20220516T163800
+
+# DATE UNTIL against a DATE-TIME seed.
+CASE:RecurSpec.groovy#test unlike temporals
+TZ:UTC
+DTSTART:20200101T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;INTERVAL=2;UNTIL=20230101
+WINDOW:20200101T000000/20250101T000000
+INSTANCES-AS:local
+INSTANCES:20200101T000000,20220101T000000
+
+# Rule text is what upstream's Recur.Builder chain produces (frequency, interval, dayList, hourList, minuteList, until).
+# Upstream window is 20220505T143700/20520519T145900 filtered to YEAR > 2051;
+# the window start here is that filter (every instance is at 16:37 or 16:38).
+CASE:RecurSpec.groovy#test getdates as stream for a large date range
+TZ:UTC
+DTSTART:20220505T143700
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=DAILY;INTERVAL=1;BYDAY=MO;BYHOUR=16;BYMINUTE=37,38;UNTIL=20520519T165900
+WINDOW:20520101T000000/20520519T145900
+INSTANCES-AS:local
+INSTANCES:20520101T163700,20520101T163800,20520108T163700,20520108T163800,20520115T163700,20520115T163800,20520122T163700,20520122T163800,20520129T163700,20520129T163800,20520205T163700,20520205T163800,20520212T163700,20520212T163800,20520219T163700,20520219T163800,20520226T163700,20520226T163800,20520304T163700,20520304T163800,20520311T163700,20520311T163800,20520318T163700,20520318T163800,20520325T163700,20520325T163800,20520401T163700,20520401T163800,20520408T163700,20520408T163800,20520415T163700,20520415T163800,20520422T163700,20520422T163800,20520429T163700,20520429T163800,20520506T163700,20520506T163800,20520513T163700,20520513T163800
+
+# Upstream: @Timeout(5), count == 86400 * 31.
+CASE:RecurSpec.groovy#test getdates as string with seed far in the past
+TZ:UTC
+DTSTART:20200101T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=SECONDLY;INTERVAL=1
+WINDOW:20260101T000000/20260131T235959
+INSTANCES-AS:local
+COUNT:2678400
+
+# Upstream: @Timeout(5) with maxincrementcount=50,000,000.
+CASE:RecurSpec.groovy#test secondly with multiple filtering rules
+TZ:UTC
+DTSTART:20200101T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=SECONDLY;INTERVAL=1;BYMONTH=1;BYMONTHDAY=31;BYHOUR=23;BYMINUTE=59;BYSECOND=0
+WINDOW:20260101T000000/20260131T235959
+INSTANCES-AS:local
+COUNT:1
+
+# Upstream only asserts list.get(7) == ZonedDateTime.of(2019, 11, 3, 0, 59, 0, 0, LA).
+CASE:RecurSpec.groovy#test getdates across a DST-change
+TZ:America/Los_Angeles
+DTSTART:20000201T005900
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=FR,SA,SU,MO
+WINDOW:20191020T200000Z/20191110T000000Z
+INSTANCES-AS:local-offset
+NTH:7=20191103T005900-0700
+
+# Upstream: @Timeout(5) with maxincrementcount=50,000,000.
+CASE:RecurSpec.groovy#test conflicting rule execution times, also with high maxincrementcount
+TZ:UTC
+DTSTART:20220101T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYMONTHDAY=1;BYDAY=2SU
+WINDOW:20220101T000000/20240101T000000
+INSTANCES-AS:local
+INSTANCES:
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# Upstream sets the JVM default zone to Australia/Melbourne and parses with ZoneId.systemDefault().
+CASE:RecurTest.java#testGetDatesCount firstFourWeeksOfYear
+TZ:Australia/Melbourne
+DTSTART:20130101T120000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYWEEKNO=1,2,3,4
+WINDOW:20130101T120000/20130123T120000
+INSTANCES-AS:local
+COUNT:4
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getDates(periodStart, periodEnd): seed = periodStart. UPSTREAM MAY BE WRONG: with ISO/WKST=MO week numbers the window holds 26 such Wednesdays (odd weeks 19-51 of 2022, 1-17 of 2023).
+CASE:RecurTest.java#testGetDatesCount everySecondWeek (issue 576)
+TZ:UTC
+DTSTART:20220501
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYDAY=WE;BYWEEKNO=1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53
+WINDOW:20220501/20230501
+INSTANCES-AS:local
+COUNT:27
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# Upstream sets the JVM default zone to Australia/Melbourne and parses with ZoneId.systemDefault().
+CASE:RecurTest.java#testGetDatesCount threeWeekdays
+TZ:Australia/Melbourne
+DTSTART:20131215T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=DAILY;COUNT=3;INTERVAL=1;BYDAY=MO,TU,WE,TH,FR
+WINDOW:20131215T000000/20180101T120000
+INSTANCES-AS:local
+COUNT:3
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# Upstream sets the JVM default zone to Australia/Melbourne and parses with ZoneId.systemDefault().
+CASE:RecurTest.java#testGetDatesCount firstFourWeeksOfYear 2016
+TZ:Australia/Melbourne
+DTSTART:20131215T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYWEEKNO=1,2,3,4
+WINDOW:20160101T120000/20160123T120000
+INSTANCES-AS:local
+COUNT:3
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# Upstream also asserts it runs in under 100ms.
+CASE:RecurTest.java#testGetDatesMaxTime everyThursdayUntil
+TZ:UTC
+DTSTART:20160414T100000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;WKST=MO;UNTIL=20160901T230000;INTERVAL=1;BYDAY=TH
+WINDOW:20110713T213021/20230713T213021
+INSTANCES-AS:local
+COUNT:21
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# Upstream also asserts it runs in under 100ms.
+CASE:RecurTest.java#testGetDatesMaxTime firstSaturdayOfMonth
+TZ:UTC
+DTSTART:20160507T090000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;WKST=MO;INTERVAL=1;BYDAY=1SA
+WINDOW:20110713T213022/20260713T213022
+INSTANCES-AS:local
+COUNT:123
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# Upstream also asserts it runs in under 100ms.
+CASE:RecurTest.java#testGetDatesMaxTime everyWednesday
+TZ:UTC
+DTSTART:20160427T160000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;WKST=MO;INTERVAL=1;BYDAY=WE
+WINDOW:20110713T213022/20230713T213022
+INSTANCES-AS:local
+COUNT:377
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# Upstream also asserts it runs in under 100ms.
+CASE:RecurTest.java#testGetDatesMaxTime everyThursday
+TZ:UTC
+DTSTART:20200324T200000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;WKST=MO;INTERVAL=1;BYDAY=TU
+WINDOW:20110714T083812/20230714T083812
+INSTANCES-AS:local
+COUNT:173
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+CASE:RecurTest.java#testGetNextDate everyDay [0]
+TZ:UTC
+DTSTART:20080401
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=DAILY;COUNT=3
+AFTER:20080401
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:20080402
+MORE:any
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+CASE:RecurTest.java#testGetNextDate everyDay [1]
+TZ:UTC
+DTSTART:20080401
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=DAILY;COUNT=3
+AFTER:20080402
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:20080403
+MORE:any
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+CASE:RecurTest.java#testGetNextDate everyDay [2]
+TZ:UTC
+DTSTART:20080401
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=DAILY;COUNT=3
+AFTER:20080403
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:
+MORE:no
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+# Upstream parses with ZoneId.systemDefault(), which the test does not set; run as floating (UTC).
+CASE:RecurTest.java#testGetNextDate weeklyUntil [0]
+TZ:UTC
+DTSTART:20080407T063000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;UNTIL=20080421T063000
+AFTER:20080407T063000
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:20080414T063000
+MORE:any
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+# Upstream parses with ZoneId.systemDefault(), which the test does not set; run as floating (UTC).
+CASE:RecurTest.java#testGetNextDate weeklyUntil [1]
+TZ:UTC
+DTSTART:20080407T063000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;UNTIL=20080421T063000
+AFTER:20080414T063000
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:20080421T063000
+MORE:any
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+# Upstream parses with ZoneId.systemDefault(), which the test does not set; run as floating (UTC).
+CASE:RecurTest.java#testGetNextDate weeklyUntil [2]
+TZ:UTC
+DTSTART:20080407T063000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;UNTIL=20080421T063000
+AFTER:20080421T063000
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:
+MORE:no
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+# Search start is before the seed.
+CASE:RecurTest.java#testGetNextDate everyMonday
+TZ:UTC
+DTSTART:20081212
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=WEEKLY;BYDAY=MO
+AFTER:20081211
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:20081215
+MORE:any
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+# Upstream parses with ZoneId.systemDefault(), which the test does not set; run as floating (UTC).
+CASE:RecurTest.java#testGetNextDate firstSundayOfApril
+TZ:UTC
+DTSTART:20081103T070000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYMONTH=4;BYDAY=1SU
+AFTER:20081109T210000
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:20090405T070000
+MORE:any
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+# Upstream parses with ZoneId.systemDefault(), which the test does not set; run as floating (UTC).
+CASE:RecurTest.java#testGetNextDate everySecondYearLastDayOfMonth
+TZ:UTC
+DTSTART:20081103T070000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;COUNT=4;INTERVAL=2;BYMONTH=1,2,3;BYMONTHDAY=-1
+AFTER:20081109T210000
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:20100131T070000
+MORE:any
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+# Upstream parses with ZoneId.systemDefault(), which the test does not set; run as floating (UTC).
+CASE:RecurTest.java#testGetNextDate lastDayOfFebMarSepOct
+TZ:UTC
+DTSTART:20150701T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;WKST=MO;INTERVAL=1;BYMONTH=2,3,9,10;BYMONTHDAY=28,29,30,31;BYSETPOS=-1
+AFTER:20150701T000000
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:20150930T000000
+MORE:any
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+# Upstream comment says 'should return feb 28 2021' but the asserted value is 2024-02-29.
+CASE:RecurTest.java#testGetNextDate everySecondMonth
+TZ:UTC
+DTSTART:20200229T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYMONTH=2;INTERVAL=1
+AFTER:20200229T000000
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:20240229T000000
+MORE:any
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+# Upstream parses with ZoneId.systemDefault(), which the test does not set; run as floating (UTC).
+CASE:RecurTest.java#testGetNextDate everySecondMonth30th
+TZ:UTC
+DTSTART:20200229T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYMONTH=2;BYMONTHDAY=30;INTERVAL=1
+AFTER:20200229T000000
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:
+MORE:no
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+# RFC 5545 expands YEARLY;BYMONTHDAY across all months (next: 20200329); ical4j limits it to the seed's month.
+CASE:RecurTest.java#testGetNextDate every29th
+TZ:UTC
+DTSTART:20200229T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;BYMONTHDAY=29;INTERVAL=1
+AFTER:20200229T000000
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:20240229T000000
+MORE:any
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+# Upstream parses with ZoneId.systemDefault(), which the test does not set; run as floating (UTC).
+CASE:RecurTest.java#testGetNextDate everyFourthYear
+TZ:UTC
+DTSTART:20200229T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=YEARLY;INTERVAL=4
+AFTER:20200229T000000
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:20240229T000000
+MORE:any
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+# UPSTREAM LOOKS WRONG: its own comment says 'should return jun 30 2020' (a Tuesday); asserts 2020-07-31.
+CASE:RecurTest.java#testGetNextDate lastWeekdayOfMonth
+TZ:UTC
+DTSTART:20200531T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1
+AFTER:20200531T000000
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:20200731T000000
+MORE:any
+
+# RecurTest is @Disabled upstream ("Failed after re-enabling JUnit 3/4 tests"): not exercised by ical4j's build.
+# getNextDate(seed, start): first instance strictly after start; empty = upstream expects null.
+# UPSTREAM LOOKS WRONG: its own comment says 'should return nov 29 2020' (the 5th Sunday); asserts 2021-01-31.
+CASE:RecurTest.java#testGetNextDate fifthSundayOfMonth
+TZ:UTC
+DTSTART:20200831T000000
+DTSTART-INSTANCE:if-matches
+RRULE:FREQ=MONTHLY;BYDAY=SU;BYSETPOS=5
+AFTER:20200831T000000
+LIMIT:1
+INSTANCES-AS:local
+INSTANCES:20210131T000000
+MORE:any
