@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Iteration stops once a period starts after UNTIL. A rule that had stopped
   matching (`BYDAY=9SU;BYMONTH=4`) used to walk on to the end of the year range
   before ending, up to a second or more per expansion.
+- `RRuleSet::iteration_limit(steps)` sets how many steps without an occurrence
+  iteration takes before giving up (default 100,000), bounding what a
+  never-matching rule costs. Setting it also limits `all_unchecked` and direct
+  iteration.
 - `RRuleResult::limited` is true when a rule stopped at the iteration guard. The
   rule's iterator recorded it, but the set iterator `all` reads from did not pass
   it on, so a truncated result was reported as complete.

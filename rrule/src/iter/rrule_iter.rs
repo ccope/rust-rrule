@@ -1,6 +1,6 @@
 use super::counter_date::DateTimeIter;
 use super::utils::add_time_to_date;
-use super::{build_pos_list, utils::date_from_ordinal, IterInfo, MAX_ITER_LOOP};
+use super::{build_pos_list, utils::date_from_ordinal, IterInfo};
 use crate::core::{get_hour, get_minute, get_second};
 use crate::validator::YEAR_RANGE;
 use crate::{Frequency, RRule};
@@ -25,13 +25,13 @@ pub(crate) struct RRuleIter {
     /// Counter always goes down after each iteration.
     pub(crate) count: Option<u32>,
     /// If the iterator should be using iterator limits.
-    pub(crate) limited: bool,
+    pub(crate) step_limit: Option<u32>,
     /// If the iterator has been stopped by the iterator limits.
     pub(crate) was_limited: bool,
 }
 
 impl RRuleIter {
-    pub(crate) fn new(rrule: &RRule, dt_start: &Zoned, limited: bool) -> Self {
+    pub(crate) fn new(rrule: &RRule, dt_start: &Zoned, step_limit: Option<u32>) -> Self {
         // A rule may be validated against one DTSTART and iterated from another.
         // Outside the year range the year tables cannot be built, so there is
         // nothing to generate; build them for a stand-in date and finish at once.
@@ -56,7 +56,7 @@ impl RRuleIter {
             buffer: VecDeque::new(),
             finished: !in_range,
             count,
-            limited,
+            step_limit,
             was_limited: false,
         }
     }
@@ -112,15 +112,15 @@ impl RRuleIter {
         // Loop until there is at least 1 item in the buffer.
         while self.buffer.is_empty() {
             // Prevent infinite loops
-            if self.limited {
+            if let Some(step_limit) = self.step_limit {
                 loop_counter += 1;
-                if loop_counter >= MAX_ITER_LOOP {
+                if loop_counter >= step_limit {
                     self.finished = true;
                     self.was_limited = true;
                     log::warn!(
                         "Reached max loop counter (`{}`). \
                     See 'validator limits' in docs for more info.",
-                        MAX_ITER_LOOP
+                        step_limit
                     );
                     return true;
                 }

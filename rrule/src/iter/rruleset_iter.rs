@@ -1,7 +1,7 @@
 use jiff::Zoned;
 
+use super::rrule_iter::RRuleIter;
 use super::rrule_iter::WasLimited;
-use super::{rrule_iter::RRuleIter, MAX_ITER_LOOP};
 use crate::RRuleError;
 use crate::RRuleSet;
 use std::collections::BTreeSet;
@@ -12,7 +12,7 @@ use std::{collections::HashMap, iter::Iterator};
 /// Iterator over all the dates in an [`RRuleSet`].
 pub struct RRuleSetIter {
     queue: HashMap<usize, Zoned>,
-    limited: bool,
+    step_limit: Option<u32>,
     rrule_iters: Vec<RRuleIter>,
     exrules: Vec<RRuleIter>,
     exdates: BTreeSet<i64>,
@@ -28,7 +28,7 @@ impl RRuleSetIter {
         dates: &mut Vec<Zoned>,
         exrules: &mut [RRuleIter],
         exdates: &mut BTreeSet<i64>,
-        limited: bool,
+        step_limit: Option<u32>,
     ) -> (Option<Zoned>, bool) {
         if dates.is_empty() {
             return (None, false);
@@ -41,13 +41,13 @@ impl RRuleSetIter {
                 return (None, false);
             }
             // Prevent infinite loops
-            if limited {
+            if let Some(step_limit) = step_limit {
                 loop_counter += 1;
-                if loop_counter >= MAX_ITER_LOOP {
+                if loop_counter >= step_limit {
                     log::warn!(
                         "Reached max loop counter (`{}`). \
                 See 'validator limits' in docs for more info.",
-                        MAX_ITER_LOOP
+                        step_limit
                     );
                     return (None, true);
                 }
@@ -62,7 +62,7 @@ impl RRuleSetIter {
         rrule_iter: &mut RRuleIter,
         exrules: &mut [RRuleIter],
         exdates: &mut BTreeSet<i64>,
-        limited: bool,
+        step_limit: Option<u32>,
     ) -> (Option<Zoned>, bool) {
         let mut date = match rrule_iter.next() {
             Some(d) => d,
@@ -71,13 +71,13 @@ impl RRuleSetIter {
         let mut loop_counter: u32 = 0;
         while Self::is_date_excluded(&date, exrules, exdates) {
             // Prevent infinite loops
-            if limited {
+            if let Some(step_limit) = step_limit {
                 loop_counter += 1;
-                if loop_counter >= MAX_ITER_LOOP {
+                if loop_counter >= step_limit {
                     log::warn!(
                         "Reached max loop counter (`{}`). \
                     See 'validator limits' in docs for more info.",
-                        MAX_ITER_LOOP
+                        step_limit
                     );
                     return (None, true);
                 }
@@ -145,7 +145,7 @@ impl RRuleSetIter {
                     rrule_iter,
                     &mut self.exrules,
                     &mut self.exdates,
-                    self.limited,
+                    self.step_limit,
                 );
 
                 if was_limited {
@@ -180,7 +180,7 @@ impl RRuleSetIter {
             &mut self.rdates,
             &mut self.exrules,
             &mut self.exdates,
-            self.limited,
+            self.step_limit,
         );
         if was_limited {
             self.was_limited = true;
@@ -223,21 +223,21 @@ impl IntoIterator for &RRuleSet {
         rdates_sorted
             .sort_by(|d1, d2| d2.partial_cmp(d1).expect("Could not order dates correctly"));
 
-        let limited = self.limited;
+        let step_limit = self.limited.then_some(self.iteration_limit);
 
         RRuleSetIter {
             queue: HashMap::new(),
-            limited,
+            step_limit,
             rrule_iters: self
                 .rrule
                 .iter()
-                .map(|rrule| rrule.iter_with_ctx(&self.dt_start, limited))
+                .map(|rrule| rrule.iter_with_ctx(&self.dt_start, step_limit))
                 .collect(),
             rdates: rdates_sorted,
             exrules: self
                 .exrule
                 .iter()
-                .map(|exrule| exrule.iter_with_ctx(&self.dt_start, limited))
+                .map(|exrule| exrule.iter_with_ctx(&self.dt_start, step_limit))
                 .collect(),
             exdates: self
                 .exdate

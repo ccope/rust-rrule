@@ -100,7 +100,14 @@ Limitations:
 | Max interval with freq Hourly | 10_000 (~416 days) | 65_535 (u16::MAX) |
 | Max interval with freq Minutely | 10_000 (~7 days) | 65_535 (u16::MAX) |
 | Max interval with freq Secondly | 50_000 (~13 hours) | 65_535 (u16::MAX) |
-| Iteration limit | 100_000 | 4_294_967_295 (u32::MAX) |
+| Iteration limit | 100_000 (set with `RRuleSet::iteration_limit`) | 4_294_967_295 (u32::MAX) |
+
+The iteration limit is how many steps `RRuleSet::all` (or an iterator built with
+`RRuleSet::limit`) takes without finding an occurrence before it gives up and
+sets `RRuleResult::limited`. A rule that can never match costs the full limit,
+which is up to a few seconds at 100,000 steps. `RRuleSet::iteration_limit(n)`
+sets it per rule set, for example lower for a service expanding rules it does
+not control; it then also applies to `all_unchecked` and direct iteration.
 
 By default, the "Arbitrary Limit" is used. If you instead want to use the "Crate Limit".
 Make sure you [understand the risks that come with this](#safety).

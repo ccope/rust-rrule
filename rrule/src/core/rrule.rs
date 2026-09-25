@@ -612,8 +612,8 @@ impl RRule<Unvalidated> {
 }
 
 impl RRule {
-    pub(crate) fn iter_with_ctx(&self, dt_start: &Zoned, limited: bool) -> RRuleIter {
-        RRuleIter::new(self, dt_start, limited)
+    pub(crate) fn iter_with_ctx(&self, dt_start: &Zoned, step_limit: Option<u32>) -> RRuleIter {
+        RRuleIter::new(self, dt_start, step_limit)
     }
 }
 

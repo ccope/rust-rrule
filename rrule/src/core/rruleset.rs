@@ -1,5 +1,6 @@
 use crate::core::utils::collect_with_error;
 use crate::core::{datetime_to_ical_format, datetime_to_ical_value};
+use crate::iter::DEFAULT_ITERATION_LIMIT;
 use crate::parser::{ContentLine, Grammar};
 use crate::{ParseError, RRule, RRuleError};
 use jiff::Zoned;
@@ -29,6 +30,8 @@ pub struct RRuleSet {
     pub(crate) after: Option<Zoned>,
     /// If validation limits are enabled
     pub(crate) limited: bool,
+    /// Steps without an occurrence before a limited iteration gives up.
+    pub(crate) iteration_limit: u32,
 }
 
 /// The return result of `RRuleSet::all`.
@@ -54,6 +57,7 @@ impl RRuleSet {
             before: None,
             after: None,
             limited: false,
+            iteration_limit: DEFAULT_ITERATION_LIMIT,
         }
     }
 
@@ -63,6 +67,19 @@ impl RRuleSet {
     #[must_use]
     pub fn limit(mut self) -> Self {
         self.limited = true;
+        self
+    }
+
+    /// Give up after `steps` steps that find no occurrence, instead of the default 100,000.
+    ///
+    /// Also enables the limit, so it applies to [`RRuleSet::all_unchecked`] and to
+    /// iterating the set directly, not only to [`RRuleSet::all`]. A rule that can
+    /// never match costs the whole limit, so a service expanding rules it does not
+    /// control may want a lower one. Stopping is reported in [`RRuleResult::limited`].
+    #[must_use]
+    pub fn iteration_limit(mut self, steps: u32) -> Self {
+        self.limited = true;
+        self.iteration_limit = steps;
         self
     }
 

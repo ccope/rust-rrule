@@ -168,6 +168,37 @@ fn dtstart_before_year_1_is_rejected() {
         .is_ok());
 }
 
+// Monday 29 February: after 2016 the next one is 2044-02-29, 10,226 daily steps out.
+const FAR_MATCH: &str = "DTSTART:20160301T090000Z\n\
+    RRULE:FREQ=DAILY;BYMONTH=2;BYMONTHDAY=29;BYDAY=MO;COUNT=1";
+
+#[test]
+fn default_iteration_limit_reaches_a_match_10226_steps_out() {
+    let result = FAR_MATCH.parse::<RRuleSet>().unwrap().all(1);
+    common::check_occurrences(&result.dates, &["2044-02-29T09:00:00+00:00"]);
+}
+
+#[test]
+fn a_lower_iteration_limit_stops_before_a_match_further_out() {
+    let result = FAR_MATCH
+        .parse::<RRuleSet>()
+        .unwrap()
+        .iteration_limit(10_000)
+        .all(1);
+    assert!(result.dates.is_empty());
+    assert!(result.limited, "stopping at the limit should be reported");
+}
+
+#[test]
+fn an_explicit_iteration_limit_also_bounds_unchecked_iteration() {
+    let set = FAR_MATCH
+        .parse::<RRuleSet>()
+        .unwrap()
+        .iteration_limit(10_000);
+    assert!(set.clone().all_unchecked().is_empty());
+    assert_eq!((&set).into_iter().next(), None);
+}
+
 // RRuleResult::limited says the result may be incomplete; a rule that never
 // matches runs into the iteration guard, which has to show up there.
 #[test]

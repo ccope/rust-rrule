@@ -21,5 +21,5 @@ pub use rruleset_iter::RRuleSetIter;
 
 /// Prevent loops when searching for the next event in the iterator.
 /// If after X number of iterations it still has not found an event,
-/// we can assume it will not find an event.
-static MAX_ITER_LOOP: u32 = 100_000;
+/// we can assume it will not find an event. `RRuleSet::iteration_limit` overrides it.
+pub(crate) const DEFAULT_ITERATION_LIMIT: u32 = 100_000;
