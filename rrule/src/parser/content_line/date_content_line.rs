@@ -44,12 +44,9 @@ impl TryFrom<ContentLineCaptures<'_>> for Vec<Zoned> {
             .map(|val| val.to_ascii_lowercase())
             .as_deref()
         {
-            Some("date") => {
-                warn!(
-                    "Parameter `DATE` is not supported for property name: `{}`. The dates will be interpreter with the `DATE-TIME` parameter instead.",
-                    value.property_name
-                );
-            }
+            // A DATE is read as midnight in the floating zone, the same value a DATE
+            // DTSTART generates, so all-day series match their EXDATEs.
+            Some("date") => {}
             Some("period") => {
                 warn!(
                     "Parameter `PERIOD` is not supported for property name: `{}`. The dates will be interpreter with the `DATE-TIME` parameter instead.",

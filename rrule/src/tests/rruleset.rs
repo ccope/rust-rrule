@@ -664,3 +664,57 @@ fn yearly_with_interval_2() {
         &[ymd_hms(1960, 1, 1, 9, 0, 0), ymd_hms(1962, 1, 1, 9, 0, 0)],
     );
 }
+
+// Upstream fmeringdal/rust-rrule#150: RFC 5545 §3.8.5.2 defines the recurrence set as a
+// set, so an instant produced twice is still one occurrence.
+#[test]
+fn rdate_equal_to_a_rule_occurrence_is_emitted_once() {
+    let dates = "DTSTART:20240101T090000Z\n\
+        RRULE:FREQ=DAILY;COUNT=2\n\
+        RDATE:20240102T090000Z"
+        .parse::<RRuleSet>()
+        .unwrap()
+        .all(10)
+        .dates;
+    check_occurrences(
+        &dates,
+        &["2024-01-01T09:00:00+00:00", "2024-01-02T09:00:00+00:00"],
+    );
+}
+
+#[test]
+fn two_rules_producing_the_same_instant_emit_it_once() {
+    let dates = "DTSTART:20240101T090000Z\n\
+        RRULE:FREQ=DAILY;COUNT=3\n\
+        RRULE:FREQ=DAILY;INTERVAL=2;COUNT=2"
+        .parse::<RRuleSet>()
+        .unwrap()
+        .all(10)
+        .dates;
+    check_occurrences(
+        &dates,
+        &[
+            "2024-01-01T09:00:00+00:00",
+            "2024-01-02T09:00:00+00:00",
+            "2024-01-03T09:00:00+00:00",
+        ],
+    );
+}
+
+// Upstream fmeringdal/rust-rrule#146: an all-day series (DATE DTSTART) excludes days
+// with EXDATE;VALUE=DATE, which is how Google Calendar writes them.
+#[test]
+fn all_day_series_honours_date_valued_exdates() {
+    let set: RRuleSet = "DTSTART;VALUE=DATE:20260401\n\
+        RRULE:FREQ=DAILY;COUNT=5\n\
+        EXDATE;VALUE=DATE:20260402,20260404"
+        .parse()
+        .unwrap();
+    let days: Vec<String> = set
+        .all(10)
+        .dates
+        .iter()
+        .map(|d| d.date().to_string())
+        .collect();
+    assert_eq!(days, ["2026-04-01", "2026-04-03", "2026-04-05"]);
+}

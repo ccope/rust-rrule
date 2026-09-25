@@ -24,6 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   appended, which named a different instant.
 - The supported year range is -9998..=9998 (Jiff's range, less one year on
   each side).
+- An instant produced more than once (an RDATE equal to a rule occurrence, or
+  two rules meeting) is returned once, as RFC 5545 §3.8.5.2 defines the
+  recurrence set (upstream #150).
+- `EXDATE;VALUE=DATE` no longer logs a warning: a date-only series (the form
+  Google Calendar uses for all-day events) matches its date-valued EXDATEs
+  (upstream #146). A DATE-valued EXDATE still matches nothing in a series whose
+  DTSTART has a time, as before.
 
 ## 0.14.0 (2025-04-20)
 

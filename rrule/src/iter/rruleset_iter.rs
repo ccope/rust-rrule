@@ -19,6 +19,8 @@ pub struct RRuleSetIter {
     /// Sorted additional dates in descending order
     rdates: Vec<Zoned>,
     was_limited: bool,
+    /// The instant last returned, so one produced twice is returned once (RFC 5545 §3.8.5.2).
+    last: Option<jiff::Timestamp>,
 }
 
 impl RRuleSetIter {
@@ -112,6 +114,20 @@ impl Iterator for RRuleSetIter {
     type Item = Zoned;
 
     fn next(&mut self) -> Option<Self::Item> {
+        // Candidates arrive in ascending order, so a duplicate is always the previous one.
+        loop {
+            let date = self.next_candidate()?;
+            let instant = date.timestamp();
+            if self.last != Some(instant) {
+                self.last = Some(instant);
+                return Some(date);
+            }
+        }
+    }
+}
+
+impl RRuleSetIter {
+    fn next_candidate(&mut self) -> Option<Zoned> {
         let mut next_date: Option<(usize, Zoned)> = None;
 
         // If there already was an error, return the error again.
@@ -229,6 +245,7 @@ impl IntoIterator for &RRuleSet {
                 .map(|exdate| exdate.timestamp().as_second())
                 .collect(),
             was_limited: false,
+            last: None,
         }
     }
 }
