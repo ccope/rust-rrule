@@ -154,11 +154,11 @@ impl FromStr for NWeekday {
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         let length = value.len();
 
-        if length < 2 {
+        // The weekday is the last two bytes, which is only a character boundary in ASCII.
+        if length < 2 || !value.is_ascii() {
             return Err(ParseError::InvalidWeekday(value.into()));
         }
 
-        // it doesn't have any issue, because we checked the string is ASCII above
         let wd = str_to_weekday(&value[(length - 2)..])
             .map_err(|_| ParseError::InvalidWeekday(value.into()))?;
         let nth = value[..(length - 2)].parse::<i16>().unwrap_or_default();

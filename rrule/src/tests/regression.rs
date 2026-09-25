@@ -67,3 +67,16 @@ fn issue_111() {
     let rrule_str = format!("{}", rrule.unwrap());
     assert!(rrule_str.contains("WKST=SU"));
 }
+
+// A weekday is sliced two *bytes* from the end, so a multi-byte character there
+// panicked instead of failing to parse.
+#[test]
+fn byday_with_multibyte_characters_is_a_parse_error() {
+    for byday in ["1€", "€", "M€", "€MO", "1é", "ÉMO"] {
+        let text = format!("DTSTART:20200101T090000Z\nRRULE:FREQ=WEEKLY;BYDAY={byday}");
+        assert!(
+            text.parse::<RRuleSet>().is_err(),
+            "BYDAY={byday} should not parse"
+        );
+    }
+}
