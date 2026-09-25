@@ -72,12 +72,14 @@ You should read the [security docs](https://github.com/fmeringdal/rust-rrule/blo
 
 ## Limitation and limits
 
-All dates are limited to the range or years +/-262_000[^1] because of [Chrono][chrono] limits.
-See [Chrono's limits for more info](https://github.com/chronotope/chrono#limitations).
+Dates are [Jiff][jiff] `Zoned` values, so years are limited to Jiff's range of
+-9999..=9999. The iterators also look at the neighbouring year, so a rule may
+use years -9998..=9998.
 
-Supported timezones are limited to by the timezones that [Chrono-Tz][chrono-tz] supports.
-This is equivalent to the IANA database.
-See [Chrono-Tz's limits for more info](https://github.com/chronotope/chrono-tz/#limiting-the-timezone-table-to-zones-of-interest).
+Time zones come from the IANA database as Jiff finds it: the system copy where
+there is one, or a bundled copy on platforms without one. A `TZID` using a
+legacy alias such as `US/Pacific` resolves only if the database in use still
+carries that alias; many Linux distributions now ship tzdata without them.
 
 ### Validation Limits
 
@@ -90,7 +92,7 @@ using the `Iterator` api directly.
 Limitations:
 | Description | Arbitrary Limit | Crate Limit |
 |----------------------------------|-----------------------|-----------------------------|
-| Year range | -10_000..=10_000 | -262_000..=262_000 (Chrono) |
+| Year range | -9_998..=9_998 | -9_998..=9_998 (Jiff) |
 | Max interval with freq Yearly | 10_000 (10000 years) | 65_535 (u16::MAX) |
 | Max interval with freq Monthly | 1_000 (~83 years) | 65_535 (u16::MAX) |
 | Max interval with freq Weekly | 1_000 (~19 years) | 65_535 (u16::MAX) |
@@ -114,8 +116,7 @@ The code in this project is licensed under the [MIT](LICENSE-MIT) or [Apache 2.0
 
 All contributions to this project will be similarly licensed.
 
-[chrono]: https://github.com/chronotope/chrono
-[chrono-tz]: https://github.com/chronotope/chrono-tz/
+[jiff]: https://github.com/BurntSushi/jiff
 [ical_spec]: https://icalendar.org/iCalendar-RFC-5545/3-3-10-recurrence-rule.html
 [dtstart_property]: https://icalendar.org/iCalendar-RFC-5545/3-8-2-4-date-time-start.html
 

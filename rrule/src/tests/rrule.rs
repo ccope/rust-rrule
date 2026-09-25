@@ -1,7 +1,6 @@
-use crate::core::Tz;
 use crate::tests::common::{test_recurring_rrule, ymd_hms};
+use crate::tests::compat::Tz;
 use crate::{Frequency, NWeekday, RRule, RRuleSet, Weekday};
-use chrono::{Datelike, TimeZone};
 
 #[test]
 fn yearly() {
@@ -225,7 +224,10 @@ fn yearly_by_weekday() {
     let rrule = RRule {
         freq: Frequency::Yearly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -249,8 +251,8 @@ fn yearly_by_nweekday() {
         freq: Frequency::Yearly,
         count: Some(3),
         by_weekday: vec![
-            NWeekday::Nth(1, Weekday::Tue),
-            NWeekday::Nth(-1, Weekday::Thu),
+            NWeekday::Nth(1, Weekday::Tuesday),
+            NWeekday::Nth(-1, Weekday::Thursday),
         ],
         by_hour: vec![9],
         by_minute: vec![0],
@@ -275,8 +277,8 @@ fn yearly_by_nweekday_large() {
         freq: Frequency::Yearly,
         count: Some(3),
         by_weekday: vec![
-            NWeekday::Nth(13, Weekday::Tue),
-            NWeekday::Nth(-13, Weekday::Thu),
+            NWeekday::Nth(13, Weekday::Tuesday),
+            NWeekday::Nth(-13, Weekday::Thursday),
         ],
         by_hour: vec![9],
         by_minute: vec![0],
@@ -301,7 +303,10 @@ fn yearly_by_month_and_weekday() {
         freq: Frequency::Yearly,
         count: Some(3),
         by_month: vec![1, 3],
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -326,8 +331,8 @@ fn yearly_by_month_and_nweekday() {
         count: Some(3),
         by_month: vec![1, 3],
         by_weekday: vec![
-            NWeekday::Nth(1, Weekday::Tue),
-            NWeekday::Nth(-1, Weekday::Thu),
+            NWeekday::Nth(1, Weekday::Tuesday),
+            NWeekday::Nth(-1, Weekday::Thursday),
         ],
         by_hour: vec![9],
         by_minute: vec![0],
@@ -353,8 +358,8 @@ fn yearly_by_month_and_nweekday_large() {
         count: Some(3),
         by_month: vec![1, 3],
         by_weekday: vec![
-            NWeekday::Nth(3, Weekday::Tue),
-            NWeekday::Nth(-3, Weekday::Thu),
+            NWeekday::Nth(3, Weekday::Tuesday),
+            NWeekday::Nth(-3, Weekday::Thursday),
         ],
         by_hour: vec![9],
         by_minute: vec![0],
@@ -378,7 +383,10 @@ fn yearly_by_monthday_and_weekday() {
     let rrule = RRule {
         freq: Frequency::Yearly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -403,7 +411,10 @@ fn yearly_by_month_and_monthday_and_weekday() {
         freq: Frequency::Yearly,
         count: Some(3),
         by_month: vec![1, 3],
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -523,7 +534,7 @@ fn yearly_by_weekno_and_weekday() {
     let rrule = RRule {
         freq: Frequency::Yearly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Mon)],
+        by_weekday: vec![NWeekday::Every(Weekday::Monday)],
         by_hour: vec![9],
         by_week_no: vec![1],
         by_minute: vec![0],
@@ -547,7 +558,7 @@ fn yearly_by_weekno_and_weekday_large() {
     let rrule = RRule {
         freq: Frequency::Yearly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Sun)],
+        by_weekday: vec![NWeekday::Every(Weekday::Sunday)],
         by_hour: vec![9],
         by_week_no: vec![52],
         by_minute: vec![0],
@@ -571,7 +582,7 @@ fn yearly_by_weekno_and_weekday_last() {
     let rrule = RRule {
         freq: Frequency::Yearly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Sun)],
+        by_weekday: vec![NWeekday::Every(Weekday::Sunday)],
         by_hour: vec![9],
         by_week_no: vec![-1],
         by_minute: vec![0],
@@ -595,7 +606,7 @@ fn yearly_by_weekno_and_weekday53_last() {
     let rrule = RRule {
         freq: Frequency::Yearly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Mon)],
+        by_weekday: vec![NWeekday::Every(Weekday::Monday)],
         by_hour: vec![9],
         by_week_no: vec![53],
         by_minute: vec![0],
@@ -1099,7 +1110,10 @@ fn monthly_by_weekday() {
     let rrule = RRule {
         freq: Frequency::Monthly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -1123,8 +1137,8 @@ fn monthly_by_nweekday() {
         freq: Frequency::Monthly,
         count: Some(3),
         by_weekday: vec![
-            NWeekday::Nth(1, Weekday::Tue),
-            NWeekday::Nth(-1, Weekday::Thu),
+            NWeekday::Nth(1, Weekday::Tuesday),
+            NWeekday::Nth(-1, Weekday::Thursday),
         ],
         by_hour: vec![9],
         by_minute: vec![0],
@@ -1149,8 +1163,8 @@ fn monthly_by_nweekday_large() {
         freq: Frequency::Monthly,
         count: Some(3),
         by_weekday: vec![
-            NWeekday::Nth(3, Weekday::Tue),
-            NWeekday::Nth(-3, Weekday::Thu),
+            NWeekday::Nth(3, Weekday::Tuesday),
+            NWeekday::Nth(-3, Weekday::Thursday),
         ],
         by_hour: vec![9],
         by_minute: vec![0],
@@ -1175,7 +1189,7 @@ fn issue_104() {
         freq: Frequency::Monthly,
         interval: 2,
         count: Some(3),
-        by_weekday: vec![NWeekday::Nth(-1, Weekday::Mon)],
+        by_weekday: vec![NWeekday::Nth(-1, Weekday::Monday)],
         ..Default::default()
     };
     test_recurring_rrule(
@@ -1196,7 +1210,10 @@ fn monthly_by_month_and_weekday() {
         freq: Frequency::Monthly,
         count: Some(3),
         by_month: vec![1, 3],
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -1221,8 +1238,8 @@ fn monthly_by_month_and_nweekday() {
         count: Some(3),
         by_month: vec![1, 3],
         by_weekday: vec![
-            NWeekday::Nth(1, Weekday::Tue),
-            NWeekday::Nth(-1, Weekday::Thu),
+            NWeekday::Nth(1, Weekday::Tuesday),
+            NWeekday::Nth(-1, Weekday::Thursday),
         ],
         by_hour: vec![9],
         by_minute: vec![0],
@@ -1248,8 +1265,8 @@ fn monthly_by_month_and_nweekday_large() {
         count: Some(3),
         by_month: vec![1, 3],
         by_weekday: vec![
-            NWeekday::Nth(3, Weekday::Tue),
-            NWeekday::Nth(-3, Weekday::Thu),
+            NWeekday::Nth(3, Weekday::Tuesday),
+            NWeekday::Nth(-3, Weekday::Thursday),
         ],
         by_hour: vec![9],
         by_minute: vec![0],
@@ -1273,7 +1290,10 @@ fn monthly_by_monthday_and_weekday() {
     let rrule = RRule {
         freq: Frequency::Monthly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -1298,7 +1318,10 @@ fn monthly_by_month_and_monthday_and_weekday() {
         freq: Frequency::Monthly,
         count: Some(3),
         by_month: vec![1, 3],
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -1507,7 +1530,7 @@ fn weekly() {
     let rrule = RRule {
         freq: Frequency::Weekly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue)],
+        by_weekday: vec![NWeekday::Every(Weekday::Tuesday)],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -1530,7 +1553,7 @@ fn weekly_interval() {
     let rrule = RRule {
         freq: Frequency::Weekly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue)],
+        by_weekday: vec![NWeekday::Every(Weekday::Tuesday)],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -1554,7 +1577,7 @@ fn weekly_interval_large() {
     let rrule = RRule {
         freq: Frequency::Weekly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue)],
+        by_weekday: vec![NWeekday::Every(Weekday::Tuesday)],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -1579,7 +1602,7 @@ fn weekly_by_month() {
         freq: Frequency::Weekly,
         count: Some(6),
         by_month: vec![1, 3],
-        by_weekday: vec![NWeekday::Every(Weekday::Tue)],
+        by_weekday: vec![NWeekday::Every(Weekday::Tuesday)],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -1605,7 +1628,10 @@ fn weekly_by_weekday() {
     let rrule = RRule {
         freq: Frequency::Weekly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -1629,7 +1655,10 @@ fn weekly_by_nweekday() {
     let rrule = RRule {
         freq: Frequency::Weekly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -1653,7 +1682,10 @@ fn weekly_by_month_and_weekday() {
         freq: Frequency::Weekly,
         count: Some(3),
         by_month: vec![1, 3],
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -1676,7 +1708,7 @@ fn weekly_by_hour() {
     let rrule = RRule {
         freq: Frequency::Weekly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue)],
+        by_weekday: vec![NWeekday::Every(Weekday::Tuesday)],
         by_hour: vec![6, 18],
         by_minute: vec![0],
         by_second: vec![0],
@@ -1699,7 +1731,7 @@ fn weekly_by_minute() {
     let rrule = RRule {
         freq: Frequency::Weekly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue)],
+        by_weekday: vec![NWeekday::Every(Weekday::Tuesday)],
         by_hour: vec![9],
         by_minute: vec![6, 18],
         by_second: vec![0],
@@ -1722,7 +1754,7 @@ fn weekly_by_second() {
     let rrule = RRule {
         freq: Frequency::Weekly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue)],
+        by_weekday: vec![NWeekday::Every(Weekday::Tuesday)],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![6, 18],
@@ -1745,7 +1777,7 @@ fn weekly_by_hour_and_minute() {
     let rrule = RRule {
         freq: Frequency::Weekly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue)],
+        by_weekday: vec![NWeekday::Every(Weekday::Tuesday)],
         by_hour: vec![6, 18],
         by_minute: vec![6, 18],
         by_second: vec![0],
@@ -1768,7 +1800,7 @@ fn weekly_by_hour_and_second() {
     let rrule = RRule {
         freq: Frequency::Weekly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue)],
+        by_weekday: vec![NWeekday::Every(Weekday::Tuesday)],
         by_hour: vec![6, 18],
         by_minute: vec![0],
         by_second: vec![6, 18],
@@ -1791,7 +1823,7 @@ fn weekly_by_minute_and_second() {
     let rrule = RRule {
         freq: Frequency::Weekly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue)],
+        by_weekday: vec![NWeekday::Every(Weekday::Tuesday)],
         by_hour: vec![9],
         by_minute: vec![6, 18],
         by_second: vec![6, 18],
@@ -1814,7 +1846,7 @@ fn weekly_by_hour_and_minute_and_second() {
     let rrule = RRule {
         freq: Frequency::Weekly,
         count: Some(5),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue)],
+        by_weekday: vec![NWeekday::Every(Weekday::Tuesday)],
         by_hour: vec![6, 18],
         by_minute: vec![6, 18],
         by_second: vec![6, 18],
@@ -1839,7 +1871,10 @@ fn weekly_by_setpos() {
     let rrule = RRule {
         freq: Frequency::Weekly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![6, 18],
         by_set_pos: vec![3, -3],
         by_minute: vec![0],
@@ -2001,7 +2036,10 @@ fn daily_by_weekday() {
     let rrule = RRule {
         freq: Frequency::Daily,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -2025,7 +2063,10 @@ fn daily_by_month_and_weekday() {
         freq: Frequency::Daily,
         count: Some(3),
         by_month: vec![1, 3],
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -2048,7 +2089,10 @@ fn daily_by_monthday_and_weekday() {
     let rrule = RRule {
         freq: Frequency::Daily,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -2073,7 +2117,10 @@ fn daily_by_month_and_monthday_and_weekday() {
         freq: Frequency::Daily,
         count: Some(3),
         by_month: vec![1, 3],
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -2406,7 +2453,10 @@ fn hourly_by_weekday() {
     let rrule = RRule {
         freq: Frequency::Hourly,
         count: Some(5),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_minute: vec![0],
         by_second: vec![0],
         interval: 5,
@@ -2432,7 +2482,10 @@ fn hourly_by_month_and_weekday() {
         freq: Frequency::Hourly,
         count: Some(3),
         by_month: vec![1, 3],
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_minute: vec![0],
         by_second: vec![0],
         ..Default::default()
@@ -2454,7 +2507,10 @@ fn hourly_by_monthday_and_weekday() {
     let rrule = RRule {
         freq: Frequency::Hourly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_minute: vec![0],
         by_second: vec![0],
         by_month_day: vec![1, 3],
@@ -2478,7 +2534,10 @@ fn hourly_by_month_and_monthday_and_weekday() {
         freq: Frequency::Hourly,
         count: Some(3),
         by_month: vec![1, 3],
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_minute: vec![0],
         by_second: vec![0],
         by_month_day: vec![1, 3],
@@ -2882,7 +2941,10 @@ fn minutely_by_weekday() {
     let rrule = RRule {
         freq: Frequency::Minutely,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Thu), NWeekday::Every(Weekday::Sat)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Thursday),
+            NWeekday::Every(Weekday::Saturday),
+        ],
         by_second: vec![0],
         ..Default::default()
     };
@@ -2904,7 +2966,10 @@ fn minutely_by_month_and_weekday() {
         freq: Frequency::Minutely,
         count: Some(3),
         by_month: vec![1, 3],
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_second: vec![0],
         ..Default::default()
     };
@@ -2925,7 +2990,10 @@ fn minutely_by_monthday_and_weekday() {
     let rrule = RRule {
         freq: Frequency::Minutely,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_second: vec![0],
         by_month_day: vec![1, 3],
         ..Default::default()
@@ -2948,7 +3016,10 @@ fn minutely_by_month_and_monthday_and_weekday() {
         freq: Frequency::Minutely,
         count: Some(3),
         by_month: vec![1, 3],
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_second: vec![0],
         by_month_day: vec![1, 3],
         ..Default::default()
@@ -3348,7 +3419,10 @@ fn secondly_by_weekday() {
     let rrule = RRule {
         freq: Frequency::Secondly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Thu), NWeekday::Every(Weekday::Sat)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Thursday),
+            NWeekday::Every(Weekday::Saturday),
+        ],
         ..Default::default()
     };
     test_recurring_rrule(
@@ -3369,7 +3443,10 @@ fn secondly_by_month_and_weekday() {
         freq: Frequency::Secondly,
         count: Some(3),
         by_month: vec![1, 3],
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         ..Default::default()
     };
     test_recurring_rrule(
@@ -3389,7 +3466,10 @@ fn secondly_by_monthday_and_weekday() {
     let rrule = RRule {
         freq: Frequency::Secondly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_month_day: vec![1, 3],
         ..Default::default()
     };
@@ -3411,7 +3491,10 @@ fn secondly_by_month_and_monthday_and_weekday() {
         freq: Frequency::Secondly,
         count: Some(3),
         by_month: vec![1, 3],
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_month_day: vec![1, 3],
         ..Default::default()
     };
@@ -3731,7 +3814,10 @@ fn week_start_interval_mo() {
     let rrule = RRule {
         freq: Frequency::Weekly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Sun)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Sunday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -3755,8 +3841,11 @@ fn week_start_interval_su() {
     let rrule = RRule {
         freq: Frequency::Weekly,
         count: Some(3),
-        week_start: Weekday::Sun,
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Sun)],
+        week_start: Weekday::Sunday,
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Sunday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
@@ -3777,8 +3866,6 @@ fn week_start_interval_su() {
 
 #[test]
 fn test_timezones_weekly() {
-    use chrono::Weekday::Sat;
-
     const LOS_ANGELES: Tz = Tz::America__Los_Angeles;
     const NEW_YORK: Tz = Tz::America__New_York;
     const BERLIN: Tz = Tz::Europe__Berlin;
@@ -3786,46 +3873,46 @@ fn test_timezones_weekly() {
     let rrule = RRule::default()
         .count(2)
         .freq(Frequency::Weekly)
-        .by_weekday(vec![NWeekday::Every(Sat)]);
+        .by_weekday(vec![NWeekday::Every(Weekday::Saturday)]);
     let rrule_set = rrule.build(ymd_hms(2021, 1, 1, 9, 0, 0)).unwrap();
     for o in &rrule_set {
-        assert_eq!(o.weekday(), Sat);
+        assert_eq!(o.weekday(), Weekday::Saturday);
     }
 
     // NYC (-5)
     let rrule = RRule::default()
         .count(1)
         .freq(Frequency::Weekly)
-        .by_weekday(vec![NWeekday::Every(Sat)]);
+        .by_weekday(vec![NWeekday::Every(Weekday::Saturday)]);
     let rrule_set = rrule
         .build(NEW_YORK.with_ymd_and_hms(2021, 1, 1, 9, 0, 0).unwrap())
         .unwrap();
     for o in &rrule_set {
-        assert_eq!(o.weekday(), Sat);
+        assert_eq!(o.weekday(), Weekday::Saturday);
     }
 
     // How about Berlin (+1)
     let rrule = RRule::default()
         .count(1)
         .freq(Frequency::Weekly)
-        .by_weekday(vec![NWeekday::Every(Sat)]);
+        .by_weekday(vec![NWeekday::Every(Weekday::Saturday)]);
     let rrule_set = rrule
         .build(BERLIN.with_ymd_and_hms(2021, 1, 1, 9, 0, 0).unwrap())
         .unwrap();
     for o in &rrule_set {
-        assert_eq!(o.weekday(), Sat);
+        assert_eq!(o.weekday(), Weekday::Saturday);
     }
 
     // Los Angeles (-7)
     let rrule = RRule::default()
         .count(1)
         .freq(Frequency::Weekly)
-        .by_weekday(vec![NWeekday::Every(Sat)]);
+        .by_weekday(vec![NWeekday::Every(Weekday::Saturday)]);
     let rrule_set = rrule
         .build(LOS_ANGELES.with_ymd_and_hms(2021, 1, 1, 9, 0, 0).unwrap())
         .unwrap();
     for o in &rrule_set {
-        assert_eq!(o.weekday(), Sat);
+        assert_eq!(o.weekday(), Weekday::Saturday);
     }
 }
 
@@ -3836,7 +3923,7 @@ fn test_before_inclusive_hit() {
         .unwrap();
 
     let before = ymd_hms(2012, 2, 2, 9, 30, 0);
-    let rrule = rrule.before(before);
+    let rrule = rrule.before(before.clone());
 
     assert_eq!(Some(&before), rrule.all_unchecked().last());
 }
@@ -3861,7 +3948,7 @@ fn test_after_inclusive_hit() {
         .unwrap();
 
     let after = ymd_hms(2012, 2, 2, 9, 30, 0);
-    let rrule = rrule.after(after);
+    let rrule = rrule.after(after.clone());
 
     assert_eq!(after, rrule.all(1).dates[0]);
 }
@@ -3904,7 +3991,7 @@ fn test_between_inclusive_lower_miss() {
     let middle = ymd_hms(2012, 2, 3, 9, 30, 0);
     let before = ymd_hms(2012, 2, 4, 9, 30, 0);
 
-    let rrule = rrule.before(before).after(after);
+    let rrule = rrule.before(before.clone()).after(after);
 
     assert_eq!(vec![middle, before], rrule.all_unchecked());
 }
@@ -3919,7 +4006,7 @@ fn test_between_inclusive_upper_miss() {
     let middle = ymd_hms(2012, 2, 3, 9, 30, 0);
     let before = ymd_hms(2012, 2, 4, 9, 0, 0);
 
-    let rrule = rrule.before(before).after(after);
+    let rrule = rrule.before(before).after(after.clone());
 
     assert_eq!(vec![after, middle], rrule.all_unchecked());
 }
@@ -3934,7 +4021,7 @@ fn test_between_inclusive_both_hit() {
     let middle = ymd_hms(2012, 2, 3, 9, 30, 0);
     let before = ymd_hms(2012, 2, 4, 9, 30, 0);
 
-    let rrule = rrule.before(before).after(after);
+    let rrule = rrule.before(before.clone()).after(after.clone());
 
     assert_eq!(vec![after, middle, before], rrule.all_unchecked());
 }

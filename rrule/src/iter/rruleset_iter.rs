@@ -1,9 +1,9 @@
-use chrono::DateTime;
+use jiff::Zoned;
 
 use super::rrule_iter::WasLimited;
 use super::{rrule_iter::RRuleIter, MAX_ITER_LOOP};
+use crate::RRuleError;
 use crate::RRuleSet;
-use crate::{RRuleError, Tz};
 use std::collections::BTreeSet;
 use std::str::FromStr;
 use std::{collections::HashMap, iter::Iterator};
@@ -11,23 +11,23 @@ use std::{collections::HashMap, iter::Iterator};
 #[derive(Debug, Clone)]
 /// Iterator over all the dates in an [`RRuleSet`].
 pub struct RRuleSetIter {
-    queue: HashMap<usize, DateTime<Tz>>,
+    queue: HashMap<usize, Zoned>,
     limited: bool,
     rrule_iters: Vec<RRuleIter>,
     exrules: Vec<RRuleIter>,
     exdates: BTreeSet<i64>,
     /// Sorted additional dates in descending order
-    rdates: Vec<DateTime<Tz>>,
+    rdates: Vec<Zoned>,
     was_limited: bool,
 }
 
 impl RRuleSetIter {
     fn generate_date(
-        dates: &mut Vec<DateTime<Tz>>,
+        dates: &mut Vec<Zoned>,
         exrules: &mut [RRuleIter],
         exdates: &mut BTreeSet<i64>,
         limited: bool,
-    ) -> (Option<DateTime<Tz>>, bool) {
+    ) -> (Option<Zoned>, bool) {
         if dates.is_empty() {
             return (None, false);
         }
@@ -61,7 +61,7 @@ impl RRuleSetIter {
         exrules: &mut [RRuleIter],
         exdates: &mut BTreeSet<i64>,
         limited: bool,
-    ) -> (Option<DateTime<Tz>>, bool) {
+    ) -> (Option<Zoned>, bool) {
         let mut date = match rrule_iter.next() {
             Some(d) => d,
             None => return (None, false),
@@ -91,28 +91,28 @@ impl RRuleSetIter {
     }
 
     fn is_date_excluded(
-        date: &DateTime<Tz>,
+        date: &Zoned,
         exrules: &mut [RRuleIter],
         exdates: &mut BTreeSet<i64>,
     ) -> bool {
         for exrule in exrules {
             for exdate in exrule {
-                exdates.insert(exdate.timestamp());
+                exdates.insert(exdate.timestamp().as_second());
                 if exdate > *date {
                     break;
                 }
             }
         }
 
-        exdates.contains(&date.timestamp())
+        exdates.contains(&date.timestamp().as_second())
     }
 }
 
 impl Iterator for RRuleSetIter {
-    type Item = DateTime<Tz>;
+    type Item = Zoned;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut next_date: Option<(usize, DateTime<Tz>)> = None;
+        let mut next_date: Option<(usize, Zoned)> = None;
 
         // If there already was an error, return the error again.
         if self.was_limited {
@@ -141,7 +141,7 @@ impl Iterator for RRuleSetIter {
             };
 
             if let Some(next_rrule_date) = next_rrule_date {
-                match next_date {
+                match next_date.take() {
                     None => next_date = Some((i, next_rrule_date)),
                     Some((idx, date)) => {
                         if date >= next_rrule_date {
@@ -153,6 +153,7 @@ impl Iterator for RRuleSetIter {
                         } else {
                             // Store for next iterations
                             self.queue.insert(i, next_rrule_date);
+                            next_date = Some((idx, date));
                         }
                     }
                 }
@@ -196,7 +197,7 @@ impl Iterator for RRuleSetIter {
 }
 
 impl IntoIterator for &RRuleSet {
-    type Item = DateTime<Tz>;
+    type Item = Zoned;
 
     type IntoIter = RRuleSetIter;
 
@@ -214,15 +215,19 @@ impl IntoIterator for &RRuleSet {
             rrule_iters: self
                 .rrule
                 .iter()
-                .map(|rrule| rrule.iter_with_ctx(self.dt_start, limited))
+                .map(|rrule| rrule.iter_with_ctx(&self.dt_start, limited))
                 .collect(),
             rdates: rdates_sorted,
             exrules: self
                 .exrule
                 .iter()
-                .map(|exrule| exrule.iter_with_ctx(self.dt_start, limited))
+                .map(|exrule| exrule.iter_with_ctx(&self.dt_start, limited))
                 .collect(),
-            exdates: self.exdate.iter().map(DateTime::timestamp).collect(),
+            exdates: self
+                .exdate
+                .iter()
+                .map(|exdate| exdate.timestamp().as_second())
+                .collect(),
             was_limited: false,
         }
     }

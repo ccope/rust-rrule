@@ -2,7 +2,6 @@
 //!
 //! Manually iterate over an `RRule`.
 
-use chrono::Datelike;
 use rrule::RRuleSet;
 
 fn main() {
@@ -26,6 +25,6 @@ fn main() {
             println!("These are all the weeks before 2021.");
             break;
         }
-        println!("Date: {}", next.to_rfc3339());
+        println!("Date: {next}");
     }
 }

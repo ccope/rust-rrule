@@ -3,16 +3,16 @@ use crate::core::get_hour;
 use crate::core::get_minute;
 use crate::core::get_month;
 use crate::core::get_second;
+use crate::core::{datetime_to_ical_value, WeekdayExt};
 use crate::iter::RRuleIter;
 use crate::parser::str_to_weekday;
 use crate::parser::ContentLineCaptures;
 use crate::parser::ParseError;
 use crate::validator::validate_rrule;
 use crate::validator::ValidationError;
-use crate::Tz;
 use crate::{RRuleError, RRuleSet, Unvalidated, Validated};
-use chrono::DateTime;
-use chrono::{Datelike, Month, Weekday};
+use jiff::civil::Weekday;
+use jiff::Zoned;
 #[cfg(feature = "serde")]
 use serde_with::{serde_as, DeserializeFromStr, SerializeDisplay};
 use std::cmp::Ordering;
@@ -133,10 +133,10 @@ impl NWeekday {
     /// # Example
     ///
     /// ```
-    /// use chrono::Weekday;
+    /// use rrule::Weekday;
     /// use rrule::NWeekday;
     ///
-    /// let nth_weekday = NWeekday::new(Some(1), Weekday::Mon);
+    /// let nth_weekday = NWeekday::new(Some(1), Weekday::Monday);
     /// ```
     #[must_use]
     pub fn new(number: Option<i16>, weekday: Weekday) -> Self {
@@ -175,12 +175,12 @@ impl Display for NWeekday {
     /// Returns a string representation of the [`NWeekday`]
     ///
     /// ```
-    /// use chrono::Weekday;
+    /// use rrule::Weekday;
     /// use rrule::NWeekday;
     ///
-    /// assert_eq!(format!("{}", NWeekday::Every(Weekday::Mon)), "MO");
-    /// assert_eq!(format!("{}", NWeekday::Nth(1, Weekday::Mon)), "MO");
-    /// assert_eq!(format!("{}", NWeekday::Nth(2, Weekday::Mon)), "2MO");
+    /// assert_eq!(format!("{}", NWeekday::Every(Weekday::Monday)), "MO");
+    /// assert_eq!(format!("{}", NWeekday::Nth(1, Weekday::Monday)), "MO");
+    /// assert_eq!(format!("{}", NWeekday::Nth(2, Weekday::Monday)), "2MO");
     /// ```
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let weekday = match self {
@@ -200,13 +200,13 @@ impl Display for NWeekday {
 
 fn weekday_to_str(d: Weekday) -> String {
     match d {
-        Weekday::Mon => "MO".to_string(),
-        Weekday::Tue => "TU".to_string(),
-        Weekday::Wed => "WE".to_string(),
-        Weekday::Thu => "TH".to_string(),
-        Weekday::Fri => "FR".to_string(),
-        Weekday::Sat => "SA".to_string(),
-        Weekday::Sun => "SU".to_string(),
+        Weekday::Monday => "MO".to_string(),
+        Weekday::Tuesday => "TU".to_string(),
+        Weekday::Wednesday => "WE".to_string(),
+        Weekday::Thursday => "TH".to_string(),
+        Weekday::Friday => "FR".to_string(),
+        Weekday::Saturday => "SA".to_string(),
+        Weekday::Sunday => "SU".to_string(),
     }
 }
 
@@ -231,7 +231,7 @@ pub struct RRule<Stage = Validated> {
     /// The end date after which new events will no longer be generated.
     /// If the `DateTime` is equal to an instance of the event, it will be the last event.
     #[cfg_attr(feature = "serde", serde_as(as = "DisplayFromStr"))]
-    pub(crate) until: Option<DateTime<Tz>>,
+    pub(crate) until: Option<Zoned>,
     /// The start day of the week.
     /// This will affect recurrences based on weekly periods.
     pub(crate) week_start: Weekday,
@@ -287,7 +287,7 @@ impl Default for RRule<Unvalidated> {
             interval: 1,
             count: None,
             until: None,
-            week_start: Weekday::Mon,
+            week_start: Weekday::Monday,
             by_set_pos: Vec::new(),
             by_month: Vec::new(),
             by_month_day: Vec::new(),
@@ -338,13 +338,13 @@ impl RRule<Unvalidated> {
     /// If given, this must be a datetime instance specifying the
     /// upper-bound limit of the recurrence.
     #[must_use]
-    pub fn until(mut self, until: DateTime<Tz>) -> Self {
+    pub fn until(mut self, until: Zoned) -> Self {
         self.until = Some(until);
         self
     }
 
     /// The week start day. This will affect recurrences based on weekly periods.
-    /// The default week start is [`Weekday::Mon`].
+    /// The default week start is [`Weekday::Monday`].
     #[must_use]
     pub fn week_start(mut self, week_start: Weekday) -> Self {
         self.week_start = week_start;
@@ -362,15 +362,10 @@ impl RRule<Unvalidated> {
         self
     }
 
-    /// When given, these variables will define the months to apply the recurrence to.
+    /// When given, these variables will define the months (1-12) to apply the recurrence to.
     #[must_use]
-    pub fn by_month(mut self, by_month: &[Month]) -> Self {
-        self.by_month = by_month
-            .iter()
-            .map(|month| {
-                u8::try_from(month.number_from_month()).expect("1-12 is within range of u8")
-            })
-            .collect();
+    pub fn by_month(mut self, by_month: &[u8]) -> Self {
+        self.by_month = by_month.to_vec();
         self
     }
 
@@ -443,7 +438,7 @@ impl RRule<Unvalidated> {
     }
 
     /// Fills in some additional fields in order to make iter work correctly.
-    pub(crate) fn finalize_parsed_rrule(mut self, dt_start: &DateTime<Tz>) -> Self {
+    pub(crate) fn finalize_parsed_rrule(mut self, dt_start: &Zoned) -> Self {
         // TEMP: move negative months to another list
         let mut by_month_day = vec![];
         let mut by_n_month_day = self.by_n_month_day;
@@ -549,7 +544,7 @@ impl RRule<Unvalidated> {
     /// # Errors
     ///
     /// If the properties aren't valid, it will return [`RRuleError`].
-    pub fn validate(self, dt_start: DateTime<Tz>) -> Result<RRule<Validated>, RRuleError> {
+    pub fn validate(self, dt_start: Zoned) -> Result<RRule<Validated>, RRuleError> {
         let rrule = self.finalize_parsed_rrule(&dt_start);
 
         // Validate required checks (defined by RFC 5545)
@@ -604,16 +599,16 @@ impl RRule<Unvalidated> {
     /// # Errors
     ///
     /// Returns [`RRuleError::ValidationError`] in case the rrule is invalid.
-    pub fn build(self, dt_start: DateTime<Tz>) -> Result<RRuleSet, RRuleError> {
-        let rrule = self.validate(dt_start)?;
+    pub fn build(self, dt_start: Zoned) -> Result<RRuleSet, RRuleError> {
+        let rrule = self.validate(dt_start.clone())?;
         let rrule_set = RRuleSet::new(dt_start).rrule(rrule);
         Ok(rrule_set)
     }
 }
 
 impl RRule {
-    pub(crate) fn iter_with_ctx(&self, dt_start: DateTime<Tz>, limited: bool) -> RRuleIter {
-        RRuleIter::new(self, &dt_start, limited)
+    pub(crate) fn iter_with_ctx(&self, dt_start: &Zoned, limited: bool) -> RRuleIter {
+        RRuleIter::new(self, dt_start, limited)
     }
 }
 
@@ -638,12 +633,7 @@ impl<S> Display for RRule<S> {
         res.push(format!("FREQ={}", &self.freq));
 
         if let Some(until) = &self.until {
-            let maybe_zulu = if until.timezone().is_local() { "" } else { "Z" };
-            res.push(format!(
-                "UNTIL={}{}",
-                until.format("%Y%m%dT%H%M%S"),
-                maybe_zulu
-            ));
+            res.push(format!("UNTIL={}", datetime_to_ical_value(until)));
         }
 
         if let Some(count) = &self.count {
@@ -656,7 +646,7 @@ impl<S> Display for RRule<S> {
         }
 
         // Monday is the default, no need to expose it.
-        if self.week_start != Weekday::Mon {
+        if self.week_start != Weekday::Monday {
             res.push(format!("WKST={}", weekday_to_str(self.week_start)));
         }
 
@@ -789,7 +779,7 @@ impl<S> RRule<S> {
 
     /// Get the until of the recurrence.
     #[must_use]
-    pub fn get_until(&self) -> Option<&DateTime<Tz>> {
+    pub fn get_until(&self) -> Option<&Zoned> {
         self.until.as_ref()
     }
 

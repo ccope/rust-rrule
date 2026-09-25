@@ -9,32 +9,38 @@
 fn main() {
     #[cfg(feature = "exrule")]
     {
-        use chrono::{Datelike, TimeZone};
-        use rrule::{Frequency, NWeekday, RRule, Tz, Weekday};
+        use jiff::civil::date;
+        use jiff::tz::TimeZone;
+        use rrule::{Frequency, NWeekday, RRule, Weekday};
+
+        let start = date(2020, 1, 1)
+            .at(9, 0, 0, 0)
+            .to_zoned(TimeZone::UTC)
+            .unwrap();
         // Build an rrule set that occurs weekly on Tuesday and Wednesday
         let rrule_set = RRule::default()
             .count(4)
             .freq(Frequency::Weekly)
             .by_weekday(vec![
-                NWeekday::Every(Weekday::Tue),
-                NWeekday::Every(Weekday::Wed),
+                NWeekday::Every(Weekday::Tuesday),
+                NWeekday::Every(Weekday::Wednesday),
             ])
-            .build(Tz::UTC.with_ymd_and_hms(2020, 1, 1, 9, 0, 0).unwrap())
+            .build(start.clone())
             .expect("RRule invalid");
 
         // Build exrule that occurs weekly on Wednesday
         let exrule = RRule::default()
             .count(4)
             .freq(Frequency::Weekly)
-            .by_weekday(vec![NWeekday::Every(Weekday::Wed)])
-            .validate(Tz::UTC.with_ymd_and_hms(2020, 1, 1, 9, 0, 0).unwrap())
+            .by_weekday(vec![NWeekday::Every(Weekday::Wednesday)])
+            .validate(start)
             .expect("RRule invalid");
 
         let recurrences = rrule_set.exrule(exrule).all(10).dates;
 
         // Check that all the recurrences are on a Tuesday
         for occurrence in &recurrences {
-            assert_eq!(occurrence.weekday(), Weekday::Tue);
+            assert_eq!(occurrence.weekday(), Weekday::Tuesday);
         }
 
         assert_eq!(recurrences.len(), 2);

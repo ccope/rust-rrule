@@ -4,20 +4,17 @@ use super::{
     content_line_parts::ContentLineCaptures, date_content_line::DateParameter,
     parameters::parse_parameters,
 };
-use crate::{
-    core::Tz,
-    parser::{
-        datetime::{datestring_to_date, parse_timezone},
-        ParseError,
-    },
+use crate::parser::{
+    datetime::{datestring_to_date, parse_timezone},
+    ParseError,
 };
-
-const UTC: Tz = Tz::UTC;
+use jiff::tz::TimeZone;
+use jiff::Zoned;
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct StartDateContentLine {
-    pub datetime: chrono::DateTime<Tz>,
-    pub timezone: Option<Tz>,
+    pub datetime: Zoned,
+    pub timezone: Option<TimeZone>,
     pub value: &'static str,
 }
 
@@ -37,7 +34,7 @@ impl TryFrom<&ContentLineCaptures<'_>> for StartDateContentLine {
             .map(|tz| parse_timezone(tz))
             .transpose()?;
         if timezone.is_none() && content_line.value.to_uppercase().ends_with('Z') {
-            timezone = Some(UTC);
+            timezone = Some(TimeZone::UTC);
         }
 
         let value_in_parameter = parameters.get(&DateParameter::Value);
@@ -56,7 +53,7 @@ impl TryFrom<&ContentLineCaptures<'_>> for StartDateContentLine {
             }
         }
 
-        let datetime = datestring_to_date(content_line.value, timezone, "DTSTART")?;
+        let datetime = datestring_to_date(content_line.value, timezone.as_ref(), "DTSTART")?;
 
         Ok(Self {
             datetime,
@@ -68,11 +65,13 @@ impl TryFrom<&ContentLineCaptures<'_>> for StartDateContentLine {
 
 #[cfg(test)]
 mod tests {
-    use chrono::TimeZone;
+    use crate::tests::compat::Tz;
 
     use crate::parser::content_line::PropertyName;
 
     use super::*;
+
+    const UTC: Tz = Tz::UTC;
 
     #[test]
     fn parses_dtstart_content_line() {
@@ -85,7 +84,7 @@ mod tests {
                 },
                 StartDateContentLine {
                     datetime: UTC.with_ymd_and_hms(1997, 7, 14, 12, 30, 0).unwrap(),
-                    timezone: Some(UTC),
+                    timezone: Some(UTC.zone()),
                     value: "DATE-TIME",
                 },
             ),
@@ -97,7 +96,7 @@ mod tests {
                 },
                 StartDateContentLine {
                     datetime: UTC.with_ymd_and_hms(1997, 1, 1, 0, 0, 0).unwrap(),
-                    timezone: Some(UTC),
+                    timezone: Some(UTC.zone()),
                     value: "DATE",
                 },
             ),
@@ -109,7 +108,7 @@ mod tests {
                 },
                 StartDateContentLine {
                     datetime: UTC.with_ymd_and_hms(1997, 1, 1, 0, 0, 0).unwrap(),
-                    timezone: Some(UTC),
+                    timezone: Some(UTC.zone()),
                     value: "DATE",
                 },
             ),

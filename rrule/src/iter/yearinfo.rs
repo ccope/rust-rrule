@@ -2,8 +2,9 @@ use super::{
     masks::MASKS,
     utils::{days_since_unix_epoch, get_year_len, pymod},
 };
+use crate::core::WeekdayExt;
 use crate::RRule;
-use chrono::{Datelike, TimeZone, Utc};
+use jiff::civil::Date;
 
 #[derive(Debug)]
 pub(crate) struct BaseMasks {
@@ -55,12 +56,11 @@ pub(crate) struct YearInfo {
 
 impl YearInfo {
     pub fn new(year: i32, rrule: &RRule) -> Self {
-        // It should never fail, since there is always a 1st of January, is there?
-        let first_year_day = Utc.with_ymd_and_hms(year, 1, 1, 0, 0, 0).unwrap();
+        let first_year_day = first_of_year(year);
 
         let year_len = get_year_len(year);
         let next_year_len = get_year_len(year + 1);
-        let year_ordinal = days_since_unix_epoch(&first_year_day);
+        let year_ordinal = days_since_unix_epoch(first_year_day);
         let year_start_weekday = u16::try_from(first_year_day.weekday().num_days_from_monday())
             .expect("num_days_from_monday is between 0 and 6 which is covered by u16");
 
@@ -166,14 +166,9 @@ impl YearInfo {
             let l_num_weeks = if rrule.by_week_no.contains(&-1) {
                 -1
             } else {
-                let l_year_weekday = u16::try_from(
-                    Utc.with_ymd_and_hms(year - 1, 1, 1, 0, 0, 0)
-                        // It should never fail, since there is always a 1st of January, is there?
-                        .unwrap()
-                        .weekday()
-                        .num_days_from_monday(),
-                )
-                .expect("num_days_from_monday is between 0 and 6 which is covered by u16");
+                let l_year_weekday =
+                    u16::try_from(first_of_year(year - 1).weekday().num_days_from_monday())
+                        .expect("num_days_from_monday is between 0 and 6 which is covered by u16");
 
                 let rrule_week_start = u16::try_from(rrule.week_start.num_days_from_monday())
                     .expect("num_days_from_monday is between 0 and 6 which is covered by u16");
@@ -207,4 +202,13 @@ impl YearInfo {
 
         result
     }
+}
+
+fn first_of_year(year: i32) -> Date {
+    Date::new(
+        i16::try_from(year).expect("years are validated to be within i16"),
+        1,
+        1,
+    )
+    .expect("years are validated to be within jiff's supported range")
 }

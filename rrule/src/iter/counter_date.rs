@@ -1,8 +1,10 @@
 use std::collections::HashSet;
 
-use chrono::{Datelike, TimeZone, Timelike, Utc, Weekday};
+use jiff::civil::{Date, Weekday};
+use jiff::Zoned;
 
-use crate::{Frequency, RRule, RRuleError, Tz};
+use crate::core::WeekdayExt;
+use crate::{Frequency, RRule, RRuleError};
 
 use super::{
     checks,
@@ -90,12 +92,14 @@ impl DateTimeIter {
         };
         let year_day = u32::from(month_range_mask[self.month as usize - 1]) + self.day - 1;
         let year_day_mod = year_day % 7;
-        let year_start_weekday = Utc
-            .with_ymd_and_hms(self.year, 1, 1, 0, 0, 0)
-            // It should never fail, since there is always a 1st of January, is there?
-            .unwrap()
-            .weekday()
-            .num_days_from_monday();
+        let year_start_weekday = Date::new(
+            i16::try_from(self.year).expect("years are validated to be within i16"),
+            1,
+            1,
+        )
+        .expect("every year has a 1st of January")
+        .weekday()
+        .num_days_from_monday();
 
         (year_day_mod + year_start_weekday) % 7
     }
@@ -181,7 +185,7 @@ impl DateTimeIter {
                 Some("please decrease `INTERVAL`"),
             )?;
             let new_hours = u8::try_from(self.hour % 24).expect("range 0-23 is covered by u8");
-            if by_hour.is_empty() || by_hour.iter().any(|bh| *bh == new_hours) {
+            if by_hour.is_empty() || by_hour.contains(&new_hours) {
                 break;
             }
             if prev_hours.contains(&new_hours) {
@@ -305,25 +309,24 @@ impl DateTimeIter {
     }
 }
 
-impl From<&chrono::DateTime<Tz>> for DateTimeIter {
-    fn from(dt: &chrono::DateTime<Tz>) -> Self {
+impl From<&Zoned> for DateTimeIter {
+    fn from(dt: &Zoned) -> Self {
         Self {
-            year: dt.year(),
-            month: dt.month(),
-            day: dt.day(),
-            hour: dt.hour(),
-            minute: dt.minute(),
-            second: dt.second(),
+            year: i32::from(dt.year()),
+            month: u32::try_from(dt.month()).expect("1-12 fits in u32"),
+            day: u32::try_from(dt.day()).expect("1-31 fits in u32"),
+            hour: u32::try_from(dt.hour()).expect("0-23 fits in u32"),
+            minute: u32::try_from(dt.minute()).expect("0-59 fits in u32"),
+            second: u32::try_from(dt.second()).expect("0-59 fits in u32"),
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::core::Tz;
+    use crate::tests::compat::Tz;
 
     use super::*;
-    use chrono::TimeZone;
 
     const UTC: Tz = Tz::UTC;
 

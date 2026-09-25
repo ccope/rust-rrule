@@ -1,5 +1,6 @@
+use crate::iter::rrule_iter::WasLimited;
 use crate::RRuleResult;
-use crate::{iter::rrule_iter::WasLimited, Tz};
+use jiff::Zoned;
 use std::ops::{
     Bound::{Excluded, Unbounded},
     RangeBounds,
@@ -11,13 +12,13 @@ use std::ops::{
 /// otherwise the second value of the return tuple will be `None`.
 pub(super) fn collect_with_error<T>(
     mut iterator: T,
-    start: &Option<chrono::DateTime<Tz>>,
-    end: &Option<chrono::DateTime<Tz>>,
+    start: &Option<Zoned>,
+    end: &Option<Zoned>,
     inclusive: bool,
     limit: Option<u16>,
 ) -> RRuleResult
 where
-    T: Iterator<Item = chrono::DateTime<Tz>> + WasLimited,
+    T: Iterator<Item = Zoned> + WasLimited,
 {
     let mut list = vec![];
     let mut was_limited = false;
@@ -25,10 +26,11 @@ where
     // Once a limit is tripped it will break in the `None` case.
     while limit.is_none() || matches!(limit, Some(limit) if usize::from(limit) > list.len()) {
         if let Some(value) = iterator.next() {
+            let reached_the_end = has_reached_the_end(&value, end, inclusive);
             if is_in_range(&value, start, end, inclusive) {
                 list.push(value);
             }
-            if has_reached_the_end(&value, end, inclusive) {
+            if reached_the_end {
                 // Date is after end date, so can stop iterating
                 break;
             }
@@ -47,11 +49,7 @@ where
 }
 
 /// Checks if `date` is after `end`.
-fn has_reached_the_end(
-    date: &chrono::DateTime<Tz>,
-    end: &Option<chrono::DateTime<Tz>>,
-    inclusive: bool,
-) -> bool {
+fn has_reached_the_end(date: &Zoned, end: &Option<Zoned>, inclusive: bool) -> bool {
     if inclusive {
         match end {
             Some(end) => !(..=end).contains(&date),
@@ -67,9 +65,9 @@ fn has_reached_the_end(
 
 /// Helper function to determine if a date is within a given range.
 pub(super) fn is_in_range(
-    date: &chrono::DateTime<Tz>,
-    start: &Option<chrono::DateTime<Tz>>,
-    end: &Option<chrono::DateTime<Tz>>,
+    date: &Zoned,
+    start: &Option<Zoned>,
+    end: &Option<Zoned>,
     inclusive: bool,
 ) -> bool {
     // Should it include or not include the start and/or end date?
@@ -92,10 +90,9 @@ pub(super) fn is_in_range(
 
 #[cfg(test)]
 mod tests {
-    use crate::core::Tz;
+    use crate::tests::compat::Tz;
 
     use super::*;
-    use chrono::TimeZone;
 
     const UTC: Tz = Tz::UTC;
 
@@ -108,28 +105,38 @@ mod tests {
         // In middle
         assert!(is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 1, 9, 0, 0).unwrap(),
-            &Some(start),
-            &Some(end),
+            &Some(start.clone()),
+            &Some(end.clone()),
             inclusive,
         ));
         // To small
         assert!(!is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 1, 7, 0, 0).unwrap(),
-            &Some(start),
-            &Some(end),
+            &Some(start.clone()),
+            &Some(end.clone()),
             inclusive,
         ));
         // To big
         assert!(!is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 1, 11, 0, 0).unwrap(),
-            &Some(start),
-            &Some(end),
+            &Some(start.clone()),
+            &Some(end.clone()),
             inclusive,
         ));
         // Equal to end
-        assert!(!is_in_range(&end, &Some(start), &Some(end), inclusive));
+        assert!(!is_in_range(
+            &end,
+            &Some(start.clone()),
+            &Some(end.clone()),
+            inclusive
+        ));
         // Equal to start
-        assert!(!is_in_range(&start, &Some(start), &Some(end), inclusive));
+        assert!(!is_in_range(
+            &start,
+            &Some(start.clone()),
+            &Some(end),
+            inclusive
+        ));
     }
 
     #[test]
@@ -140,26 +147,26 @@ mod tests {
         // Just after
         assert!(is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 1, 9, 0, 0).unwrap(),
-            &Some(start),
+            &Some(start.clone()),
             &None,
             inclusive,
         ));
         // To small
         assert!(!is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 1, 7, 0, 0).unwrap(),
-            &Some(start),
+            &Some(start.clone()),
             &None,
             inclusive,
         ));
         // Bigger
         assert!(is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 2, 8, 0, 0).unwrap(),
-            &Some(start),
+            &Some(start.clone()),
             &None,
             inclusive,
         ));
         // Equal to start
-        assert!(!is_in_range(&start, &Some(start), &None, inclusive));
+        assert!(!is_in_range(&start, &Some(start.clone()), &None, inclusive));
     }
 
     #[test]
@@ -171,25 +178,25 @@ mod tests {
         assert!(is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 1, 9, 0, 0).unwrap(),
             &None,
-            &Some(end),
+            &Some(end.clone()),
             inclusive,
         ));
         // Smaller
         assert!(is_in_range(
             &UTC.with_ymd_and_hms(2021, 9, 20, 10, 0, 0).unwrap(),
             &None,
-            &Some(end),
+            &Some(end.clone()),
             inclusive,
         ));
         // Bigger
         assert!(!is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 2, 8, 0, 0).unwrap(),
             &None,
-            &Some(end),
+            &Some(end.clone()),
             inclusive,
         ));
         // Equal to end
-        assert!(!is_in_range(&end, &None, &Some(end), inclusive));
+        assert!(!is_in_range(&end, &None, &Some(end.clone()), inclusive));
     }
 
     #[test]
@@ -230,28 +237,38 @@ mod tests {
         // In middle
         assert!(is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 1, 9, 0, 0).unwrap(),
-            &Some(start),
-            &Some(end),
+            &Some(start.clone()),
+            &Some(end.clone()),
             inclusive,
         ));
         // To small
         assert!(!is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 1, 7, 0, 0).unwrap(),
-            &Some(start),
-            &Some(end),
+            &Some(start.clone()),
+            &Some(end.clone()),
             inclusive,
         ));
         // To big
         assert!(!is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 1, 11, 0, 0).unwrap(),
-            &Some(start),
-            &Some(end),
+            &Some(start.clone()),
+            &Some(end.clone()),
             inclusive,
         ));
         // Equal to end
-        assert!(is_in_range(&end, &Some(start), &Some(end), inclusive));
+        assert!(is_in_range(
+            &end,
+            &Some(start.clone()),
+            &Some(end.clone()),
+            inclusive
+        ));
         // Equal to start
-        assert!(is_in_range(&start, &Some(start), &Some(end), inclusive));
+        assert!(is_in_range(
+            &start,
+            &Some(start.clone()),
+            &Some(end),
+            inclusive
+        ));
     }
 
     #[test]
@@ -262,26 +279,26 @@ mod tests {
         // Just after
         assert!(is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 1, 9, 0, 0).unwrap(),
-            &Some(start),
+            &Some(start.clone()),
             &None,
             inclusive,
         ));
         // To small
         assert!(!is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 1, 7, 0, 0).unwrap(),
-            &Some(start),
+            &Some(start.clone()),
             &None,
             inclusive,
         ));
         // Bigger
         assert!(is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 2, 8, 0, 0).unwrap(),
-            &Some(start),
+            &Some(start.clone()),
             &None,
             inclusive,
         ));
         // Equal to start
-        assert!(is_in_range(&start, &Some(start), &None, inclusive));
+        assert!(is_in_range(&start, &Some(start.clone()), &None, inclusive));
     }
 
     #[test]
@@ -293,25 +310,25 @@ mod tests {
         assert!(is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 1, 9, 0, 0).unwrap(),
             &None,
-            &Some(end),
+            &Some(end.clone()),
             inclusive,
         ));
         // Smaller
         assert!(is_in_range(
             &UTC.with_ymd_and_hms(2021, 9, 20, 10, 0, 0).unwrap(),
             &None,
-            &Some(end),
+            &Some(end.clone()),
             inclusive,
         ));
         // Bigger
         assert!(!is_in_range(
             &UTC.with_ymd_and_hms(2021, 10, 2, 8, 0, 0).unwrap(),
             &None,
-            &Some(end),
+            &Some(end.clone()),
             inclusive,
         ));
         // Equal to end
-        assert!(is_in_range(&end, &None, &Some(end), inclusive));
+        assert!(is_in_range(&end, &None, &Some(end.clone()), inclusive));
     }
 
     #[test]

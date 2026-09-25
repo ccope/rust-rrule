@@ -1,7 +1,6 @@
 #![allow(clippy::module_name_repetitions)]
 
-use chrono::{DateTime, TimeZone, Utc, Weekday};
-use rrule::{NWeekday, Tz};
+use rrule::{NWeekday, TimeZone, Weekday, Zoned};
 use std::convert::TryInto;
 
 // https://doc.rust-lang.org/std/mem/fn.size_of.html
@@ -60,32 +59,30 @@ pub fn take_vec_i32(input: &mut &[u8]) -> Vec<i32> {
 }
 
 /// Uses 8+4+8 = 20 bytes
-pub fn take_datetime(input: &mut &[u8]) -> DateTime<Tz> {
-    use chrono::offset::LocalResult;
-    // M1: Larger year range
-    match Utc.timestamp_opt(take_data_i64(input), take_data_u32(input)) {
-        LocalResult::None => {
-            // Will always succeed
-            let nanos: i64 = take_data_i64(input);
-            Utc.timestamp_nanos(nanos).with_timezone(&Tz::UTC)
-        }
-        LocalResult::Single(datetime) | LocalResult::Ambiguous(datetime, _) => {
-            datetime.with_timezone(&Tz::UTC)
-        }
-    }
+pub fn take_datetime(input: &mut &[u8]) -> Zoned {
+    // Fold arbitrary input into jiff's supported instant range.
+    let (min, max) = (
+        jiff::Timestamp::MIN.as_second(),
+        jiff::Timestamp::MAX.as_second(),
+    );
+    let seconds = min + take_data_i64(input).rem_euclid(max - min);
+    let nanos = i32::try_from(take_data_u32(input) % 1_000_000_000).unwrap();
+    jiff::Timestamp::new(seconds, nanos)
+        .unwrap_or(jiff::Timestamp::UNIX_EPOCH)
+        .to_zoned(TimeZone::UTC)
 }
 
 /// Uses 1 byte
 /// If no bytes left it will always return default (`Mon`)
 pub fn take_weekday(input: &mut &[u8]) -> Weekday {
     match take_byte(input) % 7 {
-        0 => Weekday::Mon,
-        1 => Weekday::Tue,
-        2 => Weekday::Wed,
-        3 => Weekday::Thu,
-        4 => Weekday::Fri,
-        5 => Weekday::Sat,
-        _ => Weekday::Sun,
+        0 => Weekday::Monday,
+        1 => Weekday::Tuesday,
+        2 => Weekday::Wednesday,
+        3 => Weekday::Thursday,
+        4 => Weekday::Friday,
+        5 => Weekday::Saturday,
+        _ => Weekday::Sunday,
     }
 }
 

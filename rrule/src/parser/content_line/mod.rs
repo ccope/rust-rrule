@@ -8,8 +8,8 @@ use std::fmt::Display;
 use std::str::FromStr;
 
 use crate::RRule;
-use crate::Tz;
 use crate::Unvalidated;
+use jiff::Zoned;
 
 pub(crate) use content_line_parts::ContentLineCaptures;
 pub(crate) use start_date_content_line::StartDateContentLine;
@@ -20,8 +20,8 @@ use super::ParseError;
 pub(crate) enum ContentLine {
     RRule(RRule<Unvalidated>),
     ExRule(RRule<Unvalidated>),
-    ExDate(Vec<chrono::DateTime<Tz>>),
-    RDate(Vec<chrono::DateTime<Tz>>),
+    ExDate(Vec<Zoned>),
+    RDate(Vec<Zoned>),
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]

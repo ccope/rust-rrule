@@ -9,24 +9,27 @@ fn rrule_and_exrule() {
     let rrule1 = RRule {
         freq: Frequency::Yearly,
         count: Some(6),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
         ..Default::default()
     };
-    let rrule = rrule1.validate(dt_start).unwrap();
+    let rrule = rrule1.validate(dt_start.clone()).unwrap();
 
     let rrule2 = RRule {
         freq: Frequency::Yearly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![NWeekday::Every(Weekday::Thursday)],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
         ..Default::default()
     };
-    let exrule = rrule2.validate(dt_start).unwrap();
+    let exrule = rrule2.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule).exrule(exrule);
 
@@ -75,13 +78,13 @@ fn setdate_and_exrule() {
     let rrule = RRule {
         freq: Frequency::Yearly,
         count: Some(3),
-        by_weekday: vec![NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![NWeekday::Every(Weekday::Thursday)],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
         ..Default::default()
     };
-    let exrule = rrule.validate(dt_start).unwrap();
+    let exrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start)
         .set_rdates(vec![
@@ -110,13 +113,16 @@ fn rrule_and_exdate_1() {
     let rrule = RRule {
         freq: Frequency::Yearly,
         count: Some(6),
-        by_weekday: vec![NWeekday::Every(Weekday::Tue), NWeekday::Every(Weekday::Thu)],
+        by_weekday: vec![
+            NWeekday::Every(Weekday::Tuesday),
+            NWeekday::Every(Weekday::Thursday),
+        ],
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule).set_exdates(vec![
         ymd_hms(1997, 9, 2, 9, 0, 0),
@@ -179,7 +185,7 @@ fn rrule_and_exyearly_yearly_big() {
         by_month_day: vec![2],
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let exrule = RRule {
         freq: Frequency::Yearly,
@@ -191,7 +197,7 @@ fn rrule_and_exyearly_yearly_big() {
         by_month_day: vec![2],
         ..Default::default()
     };
-    let exrule = exrule.validate(dt_start).unwrap();
+    let exrule = exrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule).exrule(exrule);
 
@@ -219,7 +225,7 @@ fn before() {
         by_month_day: vec![2],
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let exrule = RRule {
         freq: Frequency::Yearly,
@@ -231,7 +237,7 @@ fn before() {
         by_month_day: vec![2],
         ..Default::default()
     };
-    let exrule = exrule.validate(dt_start).unwrap();
+    let exrule = exrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start)
         .rrule(rrule)
@@ -258,7 +264,7 @@ fn after() {
         by_month_day: vec![2],
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let exrule = RRule {
         freq: Frequency::Yearly,
@@ -270,7 +276,7 @@ fn after() {
         by_month_day: vec![2],
         ..Default::default()
     };
-    let exrule = exrule.validate(dt_start).unwrap();
+    let exrule = exrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start)
         .rrule(rrule)
@@ -294,7 +300,7 @@ fn between() {
         by_month_day: vec![2],
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let exrule = RRule {
         freq: Frequency::Yearly,
@@ -306,7 +312,7 @@ fn between() {
         by_month_day: vec![2],
         ..Default::default()
     };
-    let exrule = exrule.validate(dt_start).unwrap();
+    let exrule = exrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start)
         .rrule(rrule)
@@ -339,7 +345,7 @@ fn before_70s() {
         by_month_day: vec![1],
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule);
 
@@ -358,7 +364,7 @@ fn secondly_with_interval_1() {
         count: Some(2),
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule);
 
@@ -378,7 +384,7 @@ fn secondly_with_interval_2() {
         interval: 2,
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule);
 
@@ -398,7 +404,7 @@ fn minutely_with_interval_1() {
         by_second: vec![0],
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule);
 
@@ -419,7 +425,7 @@ fn minutely_with_interval_2() {
         interval: 2,
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule);
 
@@ -440,7 +446,7 @@ fn hourly_with_interval_1() {
         by_second: vec![0],
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule);
 
@@ -462,7 +468,7 @@ fn hourly_with_interval_2() {
         interval: 2,
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule);
 
@@ -483,7 +489,7 @@ fn daily_with_interval_1() {
         by_second: vec![0],
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule);
 
@@ -506,7 +512,7 @@ fn daily_with_interval_2() {
         interval: 2,
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule);
 
@@ -526,11 +532,11 @@ fn weekly_with_interval_1() {
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
-        by_weekday: vec![NWeekday::Every(Weekday::Mon)],
+        by_weekday: vec![NWeekday::Every(Weekday::Monday)],
         ..Default::default()
     };
     // 4th is Monday
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule);
 
@@ -550,12 +556,12 @@ fn weekly_with_interval_2() {
         by_hour: vec![9],
         by_minute: vec![0],
         by_second: vec![0],
-        by_weekday: vec![NWeekday::Every(Weekday::Mon)],
+        by_weekday: vec![NWeekday::Every(Weekday::Monday)],
         interval: 2,
         ..Default::default()
     };
     // 4th is Monday
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule);
 
@@ -578,7 +584,7 @@ fn monthly_with_interval_1() {
         by_month_day: vec![1],
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule);
 
@@ -602,7 +608,7 @@ fn monthly_with_interval_2() {
         by_month_day: vec![1],
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule);
 
@@ -625,7 +631,7 @@ fn yearly_with_interval_1() {
         by_year_day: vec![1],
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule);
 
@@ -649,7 +655,7 @@ fn yearly_with_interval_2() {
         interval: 2,
         ..Default::default()
     };
-    let rrule = rrule.validate(dt_start).unwrap();
+    let rrule = rrule.validate(dt_start.clone()).unwrap();
 
     let set = RRuleSet::new(dt_start).rrule(rrule);
 

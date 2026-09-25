@@ -1,8 +1,8 @@
-use crate::core::datetime::datetime_to_ical_format;
 use crate::core::utils::collect_with_error;
+use crate::core::{datetime_to_ical_format, datetime_to_ical_value};
 use crate::parser::{ContentLine, Grammar};
-use crate::{ParseError, RRule, RRuleError, Tz};
-use chrono::DateTime;
+use crate::{ParseError, RRule, RRuleError};
+use jiff::Zoned;
 #[cfg(feature = "serde")]
 use serde_with::{serde_as, DeserializeFromStr, SerializeDisplay};
 use std::fmt::Display;
@@ -16,17 +16,17 @@ pub struct RRuleSet {
     /// List of rrules.
     pub(crate) rrule: Vec<RRule>,
     /// List of rdates.
-    pub(crate) rdate: Vec<DateTime<Tz>>,
+    pub(crate) rdate: Vec<Zoned>,
     /// List of exules.
     pub(crate) exrule: Vec<RRule>,
     /// List of exdates.
-    pub(crate) exdate: Vec<DateTime<Tz>>,
+    pub(crate) exdate: Vec<Zoned>,
     /// The start datetime of the recurring event.
-    pub(crate) dt_start: DateTime<Tz>,
+    pub(crate) dt_start: Zoned,
     /// If set, all returned recurrences must be before this date.
-    pub(crate) before: Option<DateTime<Tz>>,
+    pub(crate) before: Option<Zoned>,
     /// If set, all returned recurrences must be after this date.
-    pub(crate) after: Option<DateTime<Tz>>,
+    pub(crate) after: Option<Zoned>,
     /// If validation limits are enabled
     pub(crate) limited: bool,
 }
@@ -35,7 +35,7 @@ pub struct RRuleSet {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RRuleResult {
     /// List of recurrences.
-    pub dates: Vec<DateTime<Tz>>,
+    pub dates: Vec<Zoned>,
     /// It is being true if the list of dates is limited.
     /// To indicate that it can potentially contain more dates.
     pub limited: bool,
@@ -44,7 +44,7 @@ pub struct RRuleResult {
 impl RRuleSet {
     /// Creates an empty [`RRuleSet`], starting from `ds_start`.
     #[must_use]
-    pub fn new(dt_start: DateTime<Tz>) -> Self {
+    pub fn new(dt_start: Zoned) -> Self {
         Self {
             dt_start,
             rrule: vec![],
@@ -70,7 +70,7 @@ impl RRuleSet {
     ///
     /// This value will not be used if you use the `Iterator` API directly.
     #[must_use]
-    pub fn before(mut self, dt: DateTime<Tz>) -> Self {
+    pub fn before(mut self, dt: Zoned) -> Self {
         self.before = Some(dt);
         self
     }
@@ -79,7 +79,7 @@ impl RRuleSet {
     ///
     /// This value will not be used if you use the `Iterator` API directly.
     #[must_use]
-    pub fn after(mut self, dt: DateTime<Tz>) -> Self {
+    pub fn after(mut self, dt: Zoned) -> Self {
         self.after = Some(dt);
         self
     }
@@ -101,14 +101,14 @@ impl RRuleSet {
 
     /// Adds a new rdate to the set.
     #[must_use]
-    pub fn rdate(mut self, rdate: DateTime<Tz>) -> Self {
+    pub fn rdate(mut self, rdate: Zoned) -> Self {
         self.rdate.push(rdate);
         self
     }
 
     /// Adds a new exdate to the set.
     #[must_use]
-    pub fn exdate(mut self, exdate: DateTime<Tz>) -> Self {
+    pub fn exdate(mut self, exdate: Zoned) -> Self {
         self.exdate.push(exdate);
         self
     }
@@ -130,14 +130,14 @@ impl RRuleSet {
 
     /// Sets the rdates of the set.
     #[must_use]
-    pub fn set_rdates(mut self, rdates: Vec<DateTime<Tz>>) -> Self {
+    pub fn set_rdates(mut self, rdates: Vec<Zoned>) -> Self {
         self.rdate = rdates;
         self
     }
 
     /// Set the exdates of the set.
     #[must_use]
-    pub fn set_exdates(mut self, exdates: Vec<DateTime<Tz>>) -> Self {
+    pub fn set_exdates(mut self, exdates: Vec<Zoned>) -> Self {
         self.exdate = exdates;
         self
     }
@@ -156,19 +156,19 @@ impl RRuleSet {
 
     /// Returns the rdates of the set.
     #[must_use]
-    pub fn get_rdate(&self) -> &Vec<DateTime<Tz>> {
+    pub fn get_rdate(&self) -> &Vec<Zoned> {
         &self.rdate
     }
 
     /// Returns the exdates of the set.
     #[must_use]
-    pub fn get_exdate(&self) -> &Vec<DateTime<Tz>> {
+    pub fn get_exdate(&self) -> &Vec<Zoned> {
         &self.exdate
     }
 
     /// Returns the start datetime of the recurring event.
     #[must_use]
-    pub fn get_dt_start(&self) -> &DateTime<Tz> {
+    pub fn get_dt_start(&self) -> &Zoned {
         &self.dt_start
     }
 
@@ -208,25 +208,25 @@ impl RRuleSet {
     /// This method does not enforce any validation limits and might lead to
     /// very long iteration times. Please read the `SECURITY.md` for more information.
     #[must_use]
-    pub fn all_unchecked(self) -> Vec<DateTime<Tz>> {
+    pub fn all_unchecked(self) -> Vec<Zoned> {
         collect_with_error(self.into_iter(), &self.after, &self.before, true, None).dates
     }
 
     fn set_from_content_lines(self, content_lines: Vec<ContentLine>) -> Result<Self, RRuleError> {
-        let dt_start = self.dt_start;
+        let dt_start = self.dt_start.clone();
 
         content_lines.into_iter().try_fold(
             self,
             |rrule_set, content_line| match content_line {
                 ContentLine::RRule(rrule) => rrule
-                    .validate(dt_start)
+                    .validate(dt_start.clone())
                     .map(|rrule| rrule_set.rrule(rrule)),
                 #[allow(unused_variables)]
                 ContentLine::ExRule(exrule) => {
                     #[cfg(feature = "exrule")]
                     {
                         exrule
-                            .validate(dt_start)
+                            .validate(dt_start.clone())
                             .map(|exrule| rrule_set.exrule(exrule))
                     }
                     #[cfg(not(feature = "exrule"))]
@@ -299,11 +299,7 @@ impl Display for RRuleSet {
         let mut rdates = self
             .rdate
             .iter()
-            .map(|dt| {
-                let maybe_zulu = if dt.timezone().is_local() { "" } else { "Z" };
-
-                format!("{}{}", dt.format("%Y%m%dT%H%M%S"), maybe_zulu)
-            })
+            .map(datetime_to_ical_value)
             .collect::<Vec<_>>()
             .join(",");
         if !rdates.is_empty() {
@@ -324,11 +320,7 @@ impl Display for RRuleSet {
         let mut exdates = self
             .exdate
             .iter()
-            .map(|dt| {
-                let maybe_zulu = if dt.timezone().is_local() { "" } else { "Z" };
-
-                format!("{}{}", dt.format("%Y%m%dT%H%M%S"), maybe_zulu)
-            })
+            .map(datetime_to_ical_value)
             .collect::<Vec<_>>()
             .join(",");
         if !exdates.is_empty() {
@@ -345,9 +337,8 @@ impl Display for RRuleSet {
 mod tests {
     use std::str::FromStr;
 
-    use chrono::{Month, TimeZone};
-
-    use crate::{Frequency, RRule, RRuleSet, Tz};
+    use crate::tests::compat::Tz;
+    use crate::{Frequency, RRule, RRuleSet};
 
     #[test]
     fn rruleset_string_roundtrip() {
@@ -363,7 +354,7 @@ mod tests {
             rruleset.rrule,
             vec![RRule::new(Frequency::Daily)
                 .count(3)
-                .validate(dt_start)
+                .validate(dt_start.clone())
                 .unwrap()]
         );
 
@@ -381,7 +372,7 @@ mod tests {
             rruleset.exrule,
             vec![RRule::new(Frequency::Yearly)
                 .count(8)
-                .by_month(&[Month::June, Month::July])
+                .by_month(&[6, 7])
                 .validate(dt_start)
                 .unwrap()]
         );

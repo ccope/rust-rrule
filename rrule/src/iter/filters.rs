@@ -1,3 +1,4 @@
+use crate::core::WeekdayExt;
 use crate::{NWeekday, RRule};
 
 use super::iterinfo::IterInfo;

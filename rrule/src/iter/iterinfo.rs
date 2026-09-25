@@ -3,8 +3,10 @@ use super::counter_date::DateTimeIter;
 use super::easter::easter;
 use super::{monthinfo::MonthInfo, yearinfo::YearInfo};
 use crate::core::get_month;
-use crate::{Frequency, NWeekday, RRule, Tz};
-use chrono::{Datelike, NaiveTime, TimeZone};
+use crate::core::WeekdayExt;
+use crate::{Frequency, NWeekday, RRule};
+use jiff::civil::{Date, Time};
+use jiff::Zoned;
 
 #[derive(Debug, Clone)]
 pub(crate) struct IterInfo {
@@ -15,8 +17,8 @@ pub(crate) struct IterInfo {
 }
 
 impl IterInfo {
-    pub fn new(rrule: &RRule, dt_start: &chrono::DateTime<Tz>) -> Self {
-        let year = dt_start.year();
+    pub fn new(rrule: &RRule, dt_start: &Zoned) -> Self {
+        let year = i32::from(dt_start.year());
         let month = get_month(dt_start);
 
         let year_info = YearInfo::new(year, rrule);
@@ -125,13 +127,7 @@ impl IterInfo {
     pub fn weekday_set(&self, year: i32, month: u32, day: u32) -> Vec<usize> {
         let set_len = usize::from(self.year_len() + 7);
 
-        let mut date_ordinal = usize::try_from(
-            chrono::Utc
-                .with_ymd_and_hms(year, month, day, 0, 0, 0)
-                .unwrap()
-                .ordinal0(),
-        )
-        .expect("target arch should have at least 32 bits");
+        let mut date_ordinal = year_day0(year, month, day);
 
         let mut set = vec![];
 
@@ -152,15 +148,10 @@ impl IterInfo {
     }
 
     pub fn day_dayset(year: i32, month: u32, day: u32) -> Vec<usize> {
-        let date_ordinal = chrono::Utc
-            .with_ymd_and_hms(year, month, day, 0, 0, 0)
-            .unwrap()
-            .ordinal0();
-
-        vec![usize::try_from(date_ordinal).expect("target arch should have at least 32 bits")]
+        vec![year_day0(year, month, day)]
     }
 
-    pub fn hour_timeset(&self, hour: u8) -> Vec<NaiveTime> {
+    pub fn hour_timeset(&self, hour: u8) -> Vec<Time> {
         self.rrule
             .by_minute
             .iter()
@@ -168,20 +159,16 @@ impl IterInfo {
             .collect()
     }
 
-    pub fn min_timeset(&self, hour: u8, minute: u8) -> Vec<NaiveTime> {
+    pub fn min_timeset(&self, hour: u8, minute: u8) -> Vec<Time> {
         self.rrule
             .by_second
             .iter()
-            .filter_map(|second| {
-                NaiveTime::from_hms_opt(u32::from(hour), u32::from(minute), u32::from(*second))
-            })
+            .filter_map(|second| time_from_hms(hour, minute, *second))
             .collect()
     }
 
-    pub fn sec_timeset(hour: u8, minute: u8, second: u8) -> Vec<NaiveTime> {
-        if let Some(time) =
-            NaiveTime::from_hms_opt(u32::from(hour), u32::from(minute), u32::from(second))
-        {
+    pub fn sec_timeset(hour: u8, minute: u8, second: u8) -> Vec<Time> {
+        if let Some(time) = time_from_hms(hour, minute, second) {
             vec![time]
         } else {
             vec![]
@@ -208,7 +195,7 @@ impl IterInfo {
     /// This is usually called after calling the `increment_counter_date` where we know
     /// that we get a valid `DateTime` back, and there is no need to do any duplicate
     /// validation.
-    pub fn get_timeset_unchecked(&self, hour: u8, minute: u8, second: u8) -> Vec<NaiveTime> {
+    pub fn get_timeset_unchecked(&self, hour: u8, minute: u8, second: u8) -> Vec<Time> {
         match self.rrule.freq {
             Frequency::Hourly => self.hour_timeset(hour),
             Frequency::Minutely => self.min_timeset(hour, minute),
@@ -223,7 +210,7 @@ impl IterInfo {
     ///
     /// An empty set is returned if the hour, minute and second aren't valid,
     /// according to the `RRule`.
-    pub fn get_timeset(&self, hour: u8, minute: u8, second: u8) -> Vec<NaiveTime> {
+    pub fn get_timeset(&self, hour: u8, minute: u8, second: u8) -> Vec<Time> {
         match self.rrule.freq {
             Frequency::Hourly | Frequency::Minutely | Frequency::Secondly => {
                 let incorrect_hour = self.rrule.freq >= Frequency::Hourly
@@ -246,22 +233,18 @@ impl IterInfo {
                 self.get_timeset_unchecked(hour, minute, second)
             }
             _ => {
-                let timeset = self
-                    .rrule
-                    .by_hour
-                    .iter()
-                    .flat_map(|hour| {
-                        self.rrule.by_minute.iter().flat_map(move |minute| {
-                            self.rrule.by_second.iter().filter_map(move |second| {
-                                NaiveTime::from_hms_opt(
-                                    u32::from(*hour),
-                                    u32::from(*minute),
-                                    u32::from(*second),
-                                )
+                let timeset =
+                    self.rrule
+                        .by_hour
+                        .iter()
+                        .flat_map(|hour| {
+                            self.rrule.by_minute.iter().flat_map(move |minute| {
+                                self.rrule.by_second.iter().filter_map(move |second| {
+                                    time_from_hms(*hour, *minute, *second)
+                                })
                             })
                         })
-                    })
-                    .collect();
+                        .collect();
 
                 timeset
             }
@@ -271,4 +254,25 @@ impl IterInfo {
     pub fn rrule(&self) -> &RRule {
         &self.rrule
     }
+}
+
+/// Zero-based day of the year. The counter date is always a real date.
+fn year_day0(year: i32, month: u32, day: u32) -> usize {
+    let date = Date::new(
+        i16::try_from(year).expect("years are validated to be within i16"),
+        i8::try_from(month).expect("1-12 fits in i8"),
+        i8::try_from(day).expect("1-31 fits in i8"),
+    )
+    .expect("the counter date is always a valid date");
+    usize::try_from(date.day_of_year() - 1).expect("0-365 fits in usize")
+}
+
+fn time_from_hms(hour: u8, minute: u8, second: u8) -> Option<Time> {
+    Time::new(
+        i8::try_from(hour).ok()?,
+        i8::try_from(minute).ok()?,
+        i8::try_from(second).ok()?,
+        0,
+    )
+    .ok()
 }

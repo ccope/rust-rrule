@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+- Dates are `jiff::Zoned` instead of `chrono::DateTime<rrule::Tz>`, and `chrono`
+  and `chrono-tz` are no longer dependencies. `rrule::Tz` is gone; zones are
+  `jiff::tz::TimeZone`, re-exported as `rrule::TimeZone` along with `Zoned` and
+  `Weekday` (now `jiff::civil::Weekday`).
+- `RRule::by_month` takes month numbers (`&[u8]`, 1-12) instead of `chrono::Month`.
+- A floating DTSTART, RDATE, EXDATE or UNTIL (no `TZID`, no `Z`) is placed in
+  `jiff::tz::TimeZone::unknown()`, which behaves like UTC, instead of the
+  machine's local zone. Floating occurrences keep their wall-clock time and no
+  longer depend on where the code runs.
+- A local time that its zone skips or repeats is resolved as RFC 5545 §3.3.5
+  specifies (the offset before a gap; the first occurrence in a fold), both when
+  parsing DTSTART/RDATE/EXDATE and when generating occurrences. Parsing such a
+  time used to be an error.
+- RDATE, EXDATE and UNTIL values in a zone other than UTC are written back in
+  UTC with a `Z`; they used to be written as their local time with a `Z`
+  appended, which named a different instant.
+- The supported year range is -9998..=9998 (Jiff's range, less one year on
+  each side).
+
 ## 0.14.0 (2025-04-20)
 
 - MSRV is bumped to `1.81.0` from `v1.74.0`

@@ -1,6 +1,6 @@
 use std::{collections::HashMap, marker::PhantomData, str::FromStr};
 
-use chrono::Weekday;
+use jiff::civil::Weekday;
 
 use crate::{
     parser::{
@@ -118,7 +118,7 @@ fn props_to_rrule(
                 .map_err(|_| ParseError::InvalidWeekdayStart(week_start.into()))
         })
         .transpose()?
-        .unwrap_or(Weekday::Mon);
+        .unwrap_or(Weekday::Monday);
     let by_set_pos = props
         .get(&RRuleProperty::BySetPos)
         .map(|by_set_pos| {

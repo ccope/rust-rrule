@@ -1,5 +1,3 @@
-use chrono::Month;
-
 use crate::tests::common;
 use crate::{Frequency, RRule, RRuleSet, Unvalidated};
 
@@ -53,7 +51,7 @@ fn issue_61() {
 fn issue_97() {
     let rrule = RRule::new(Frequency::Yearly)
         .by_month_day((24..=26).collect())
-        .by_month(&[Month::December]);
+        .by_month(&[12]);
 
     assert_eq!(
         rrule.to_string(),

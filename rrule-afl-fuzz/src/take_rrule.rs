@@ -1,8 +1,6 @@
 #![allow(clippy::wildcard_imports, clippy::module_name_repetitions)]
 
 use crate::take_data::*;
-use chrono::Month;
-use num_traits::cast::FromPrimitive;
 use rrule::{Frequency, RRule, RRuleSet};
 
 /// This function uses the data to construct a deterministic input for [`RRuleSet`].
@@ -61,8 +59,8 @@ pub fn take_rrule_from_data(mut data: &[u8]) -> Option<RRuleSet> {
     let week_start = take_weekday(&mut data);
     let by_set_pos = take_vec_i32(&mut data);
     let by_month = take_vec_u8(&mut data)
-        .iter()
-        .filter_map(|x| Month::from_u8(*x))
+        .into_iter()
+        .filter(|month| (1..=12).contains(month))
         .collect::<Vec<_>>();
     let by_month_day = take_vec_i8(&mut data);
     let _by_n_month_day = take_vec_i8(&mut data);

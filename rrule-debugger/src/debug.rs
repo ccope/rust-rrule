@@ -1,7 +1,6 @@
 #![allow(dead_code, unused_imports)]
 
-use chrono::{DateTime, TimeZone, Weekday};
-use rrule::{Frequency, RRule, RRuleSet, Tz};
+use rrule::{Frequency, RRule, RRuleSet, TimeZone, Weekday, Zoned};
 
 /// This function can be used to test anything and can be changes as you wish.
 pub fn run_debug_function() {
@@ -23,7 +22,7 @@ fn test_from_string() {
 fn test_parsed_rrule() {
     let properties = RRule::new(Frequency::Daily)
         .count(20)
-        .week_start(Weekday::Sun)
+        .week_start(Weekday::Sunday)
         .by_hour(vec![9])
         .by_minute(vec![0])
         .by_second(vec![0]);
@@ -35,8 +34,9 @@ fn test_parsed_rrule() {
     crate::print_all_datetimes(&result.dates);
 }
 
-fn ymd_hms(year: i32, month: u32, day: u32, hour: u32, minute: u32, second: u32) -> DateTime<Tz> {
-    Tz::UTC
-        .with_ymd_and_hms(year, month, day, hour, minute, second)
+fn ymd_hms(year: i16, month: i8, day: i8, hour: i8, minute: i8, second: i8) -> Zoned {
+    jiff::civil::date(year, month, day)
+        .at(hour, minute, second, 0)
+        .to_zoned(TimeZone::UTC)
         .unwrap()
 }

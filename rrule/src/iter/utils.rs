@@ -1,20 +1,26 @@
 use std::ops;
 
-use crate::core::{duration_from_midnight, Tz};
-use chrono::{NaiveDate, NaiveTime, Utc};
+use jiff::civil::{Date, Time};
+use jiff::tz::TimeZone;
+use jiff::{Timestamp, Zoned};
 
 const DAY_SECS: i64 = 24 * 60 * 60;
 
 /// Converts number of days since unix epoch to a (naive) date.
-pub(crate) fn date_from_ordinal(ordinal: i64) -> NaiveDate {
-    chrono::DateTime::<Utc>::from_timestamp(ordinal * DAY_SECS, 0)
-        .unwrap()
-        .date_naive()
+pub(crate) fn date_from_ordinal(ordinal: i64) -> Date {
+    Timestamp::from_second(ordinal * DAY_SECS)
+        .expect("ordinals come from dates within jiff's supported range")
+        .to_zoned(TimeZone::UTC)
+        .date()
 }
 
 /// Returns number of days since unix epoch (rounded down)
-pub(crate) fn days_since_unix_epoch(date: &chrono::DateTime<Utc>) -> i64 {
-    date.timestamp() / DAY_SECS
+pub(crate) fn days_since_unix_epoch(date: Date) -> i64 {
+    date.to_zoned(TimeZone::UTC)
+        .expect("a civil date at midnight UTC always exists")
+        .timestamp()
+        .as_second()
+        .div_euclid(DAY_SECS)
 }
 
 /// Returns true if given year is a leap year
@@ -72,37 +78,28 @@ where
     }
 }
 
-pub(crate) fn add_time_to_date(
-    tz: Tz,
-    date: NaiveDate,
-    time: NaiveTime,
-) -> Option<chrono::DateTime<Tz>> {
-    if let Some(dt) = date.and_time(time).and_local_timezone(tz).single() {
-        return Some(dt);
-    }
-    // If the day is a daylight saving time, the above code might not work, and we
-    // can try to get a valid datetime by adding the `time` as a duration instead.
-    let dt = date.and_hms_opt(0, 0, 0)?.and_local_timezone(tz).single()?;
-    let day_duration = duration_from_midnight(time);
-    dt.checked_add_signed(day_duration)
+/// Places `time` on `date` in `tz`, resolving a time the clock skips (a DST gap)
+/// by the offset before the gap and a time it repeats (a fold) by the earlier
+/// occurrence, as RFC 5545 §3.3.5 requires.
+pub(crate) fn add_time_to_date(tz: &TimeZone, date: Date, time: Time) -> Option<Zoned> {
+    tz.to_zoned(date.to_datetime(time)).ok()
 }
-
 #[cfg(test)]
 mod test {
 
-    use chrono::{Duration, TimeZone};
+    use crate::tests::compat::Tz;
 
     use super::*;
 
     #[test]
     fn naive_date_from_ordinal() {
         let tests = [
-            (-1, NaiveDate::from_ymd_opt(1969, 12, 31).unwrap()),
-            (0, NaiveDate::from_ymd_opt(1970, 1, 1).unwrap()),
-            (1, NaiveDate::from_ymd_opt(1970, 1, 2).unwrap()),
-            (10, NaiveDate::from_ymd_opt(1970, 1, 11).unwrap()),
-            (365, NaiveDate::from_ymd_opt(1971, 1, 1).unwrap()),
-            (19877, NaiveDate::from_ymd_opt(2024, 6, 3).unwrap()),
+            (-1, jiff::civil::date(1969, 12, 31)),
+            (0, jiff::civil::date(1970, 1, 1)),
+            (1, jiff::civil::date(1970, 1, 2)),
+            (10, jiff::civil::date(1970, 1, 11)),
+            (365, jiff::civil::date(1971, 1, 1)),
+            (19877, jiff::civil::date(2024, 6, 3)),
         ];
 
         for (days, expected) in tests {
@@ -160,27 +157,26 @@ mod test {
         let tests = [
             (
                 Tz::UTC,
-                NaiveDate::from_ymd_opt(2017, 1, 1).unwrap(),
-                NaiveTime::from_hms_opt(1, 15, 30).unwrap(),
+                jiff::civil::date(2017, 1, 1),
+                jiff::civil::time(1, 15, 30, 0),
                 Some(Tz::UTC.with_ymd_and_hms(2017, 1, 1, 1, 15, 30).unwrap()),
             ),
             (
                 Tz::America__Vancouver,
-                NaiveDate::from_ymd_opt(2021, 3, 14).unwrap(),
-                NaiveTime::from_hms_opt(2, 22, 10).unwrap(),
+                jiff::civil::date(2021, 3, 14),
+                jiff::civil::time(2, 22, 10, 0),
                 Some(
                     Tz::America__Vancouver
                         .with_ymd_and_hms(2021, 3, 14, 0, 0, 0)
                         .unwrap()
-                        + Duration::hours(2)
-                        + Duration::minutes(22)
-                        + Duration::seconds(10),
+                        .checked_add(jiff::SignedDuration::from_secs(2 * 3600 + 22 * 60 + 10))
+                        .unwrap(),
                 ),
             ),
             (
                 Tz::America__New_York,
-                NaiveDate::from_ymd_opt(1997, 10, 26).unwrap(),
-                NaiveTime::from_hms_opt(9, 0, 0).unwrap(),
+                jiff::civil::date(1997, 10, 26),
+                jiff::civil::time(9, 0, 0, 0),
                 Some(
                     Tz::America__New_York
                         .with_ymd_and_hms(1997, 10, 26, 9, 0, 0)
@@ -190,7 +186,7 @@ mod test {
         ];
 
         for (tz, date, time, expected_output) in tests {
-            let res = add_time_to_date(tz, date, time);
+            let res = add_time_to_date(&tz.zone(), date, time);
             assert_eq!(res, expected_output);
         }
     }

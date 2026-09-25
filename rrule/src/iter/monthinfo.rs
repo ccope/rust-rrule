@@ -1,4 +1,5 @@
 use super::{utils::pymod, yearinfo::YearInfo};
+use crate::core::WeekdayExt;
 use crate::{Frequency, NWeekday, RRule};
 
 #[derive(Debug, Clone)]
@@ -121,9 +122,10 @@ impl MonthInfo {
 
 #[cfg(test)]
 mod tests {
-    use chrono::{TimeZone, Weekday};
 
-    use crate::core::Tz;
+    use jiff::civil::Weekday;
+
+    use crate::tests::compat::Tz;
 
     use super::*;
 
@@ -165,9 +167,9 @@ mod tests {
         let rrule = RRule {
             freq: Frequency::Yearly,
             by_weekday: vec![
-                NWeekday::new(None, Weekday::Mon),
-                NWeekday::new(Some(-2), Weekday::Thu),
-                NWeekday::new(Some(1), Weekday::Thu),
+                NWeekday::new(None, Weekday::Monday),
+                NWeekday::new(Some(-2), Weekday::Thursday),
+                NWeekday::new(Some(1), Weekday::Thursday),
             ],
             ..Default::default()
         }
@@ -192,9 +194,9 @@ mod tests {
         let rrule = RRule {
             freq: Frequency::Monthly,
             by_weekday: vec![
-                NWeekday::new(None, Weekday::Mon),
-                NWeekday::new(Some(-2), Weekday::Thu),
-                NWeekday::new(Some(1), Weekday::Thu),
+                NWeekday::new(None, Weekday::Monday),
+                NWeekday::new(Some(-2), Weekday::Thursday),
+                NWeekday::new(Some(1), Weekday::Thursday),
             ],
             ..Default::default()
         }

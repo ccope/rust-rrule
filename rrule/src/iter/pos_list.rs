@@ -1,14 +1,15 @@
 use super::utils::{add_time_to_date, date_from_ordinal, pymod};
-use crate::core::Tz;
-use chrono::NaiveTime;
+use jiff::civil::Time;
+use jiff::tz::TimeZone;
+use jiff::Zoned;
 
 pub(crate) fn build_pos_list(
     by_set_pos: &[i32],
     dayset: &[usize],
-    timeset: &[NaiveTime],
+    timeset: &[Time],
     year_ordinal: i64,
-    tz: Tz,
-) -> Vec<chrono::DateTime<Tz>> {
+    tz: &TimeZone,
+) -> Vec<Zoned> {
     let mut pos_list = vec![];
 
     if timeset.is_empty() {

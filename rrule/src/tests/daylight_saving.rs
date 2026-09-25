@@ -65,3 +65,60 @@ fn daylight_savings_2() {
         ],
     );
 }
+
+#[test]
+fn repeated_local_time_resolves_to_first_occurrence() {
+    // 01:30 happens twice on 2021-11-07 in Vancouver; RFC 5545 §3.3.5 picks the first (PDT).
+    let dates = "DTSTART;TZID=America/Vancouver:20211106T013000\nRRULE:FREQ=DAILY;COUNT=3"
+        .parse::<RRuleSet>()
+        .unwrap()
+        .all(10)
+        .dates;
+    check_occurrences(
+        &dates,
+        &[
+            "2021-11-06T01:30:00-07:00",
+            "2021-11-07T01:30:00-07:00",
+            "2021-11-08T01:30:00-08:00",
+        ],
+    );
+}
+
+#[test]
+fn dtstart_inside_a_gap_uses_the_offset_before_it() {
+    // 02:30 does not exist on 2021-03-14 in Vancouver; it resolves one hour later, as PDT.
+    // Whether later occurrences should be at 02:30 or at the resolved 03:30 is left
+    // to recorded Google fixtures; only the DTSTART itself is pinned here.
+    let dates = "DTSTART;TZID=America/Vancouver:20210314T023000\nRRULE:FREQ=DAILY;COUNT=1"
+        .parse::<RRuleSet>()
+        .unwrap()
+        .all(10)
+        .dates;
+    check_occurrences(&dates, &["2021-03-14T03:30:00-07:00"]);
+}
+
+#[test]
+fn floating_occurrences_keep_their_wall_clock_time() {
+    // A floating 02:30 never meets a DST transition, wherever the code runs.
+    let set: RRuleSet = "DTSTART:20210313T023000\nRRULE:FREQ=DAILY;COUNT=3"
+        .parse()
+        .unwrap();
+    let dates = set.clone().all(10).dates;
+    let times: Vec<String> = dates
+        .iter()
+        .map(|d| d.datetime().strftime("%Y-%m-%dT%H:%M:%S").to_string())
+        .collect();
+    assert_eq!(
+        times,
+        [
+            "2021-03-13T02:30:00",
+            "2021-03-14T02:30:00",
+            "2021-03-15T02:30:00"
+        ]
+    );
+    assert!(dates.iter().all(|d| d.time_zone().is_unknown()));
+    assert_eq!(
+        set.to_string(),
+        "DTSTART:20210313T023000\nRRULE:FREQ=DAILY;COUNT=3;BYHOUR=2;BYMINUTE=30;BYSECOND=0"
+    );
+}

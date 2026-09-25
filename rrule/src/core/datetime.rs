@@ -1,51 +1,94 @@
-use super::timezone::Tz;
-use chrono::{Datelike, Duration, NaiveTime, Timelike};
+use jiff::tz::TimeZone;
+use jiff::Zoned;
 
-pub(crate) fn duration_from_midnight(time: NaiveTime) -> Duration {
-    Duration::hours(i64::from(time.hour()))
-        + Duration::minutes(i64::from(time.minute()))
-        + Duration::seconds(i64::from(time.second()))
+/// The zone a floating DATE or DATE-TIME (no `TZID`, no `Z`) is placed in.
+///
+/// RFC 5545 floating values are not bound to any zone. Jiff's unknown zone
+/// behaves like UTC, so floating arithmetic never meets a DST transition, and
+/// unlike UTC it can be told apart when the value is written back out.
+pub(crate) fn floating() -> TimeZone {
+    TimeZone::unknown()
 }
 
-pub(crate) fn get_month(dt: &chrono::DateTime<Tz>) -> u8 {
+pub(crate) fn is_floating(tz: &TimeZone) -> bool {
+    tz.is_unknown()
+}
+
+pub(crate) fn is_utc(tz: &TimeZone) -> bool {
+    tz.iana_name() == Some("UTC") || *tz == TimeZone::UTC
+}
+
+pub(crate) fn get_month(dt: &Zoned) -> u8 {
     u8::try_from(dt.month()).expect("month is between 1-12 which is covered by u8")
 }
 
-pub(crate) fn get_day(dt: &chrono::DateTime<Tz>) -> i8 {
-    i8::try_from(dt.day()).expect("day is between 1-31 which is covered by i8")
+pub(crate) fn get_day(dt: &Zoned) -> i8 {
+    dt.day()
 }
 
-pub(crate) fn get_hour(dt: &chrono::DateTime<Tz>) -> u8 {
+pub(crate) fn get_hour(dt: &Zoned) -> u8 {
     u8::try_from(dt.hour()).expect("hour is between 0-23 which is covered by u8")
 }
 
-pub(crate) fn get_minute(dt: &chrono::DateTime<Tz>) -> u8 {
+pub(crate) fn get_minute(dt: &Zoned) -> u8 {
     u8::try_from(dt.minute()).expect("minute is between 0-59 which is covered by u8")
 }
 
-pub(crate) fn get_second(dt: &chrono::DateTime<Tz>) -> u8 {
+pub(crate) fn get_second(dt: &Zoned) -> u8 {
     u8::try_from(dt.second()).expect("second is between 0-59 which is covered by u8")
 }
 
-/// Generates an iCalendar date-time string format with the prefix symbols.
-/// Like: `:19970714T173000Z` or `;TZID=America/New_York:19970714T133000`
-/// ref: <https://tools.ietf.org/html/rfc5545#section-3.3.5>
-pub(crate) fn datetime_to_ical_format(dt: &chrono::DateTime<Tz>) -> String {
-    let mut tz_prefix = String::new();
-    let mut tz_postfix = String::new();
-    let tz = dt.timezone();
-    match tz {
-        Tz::Local(_) => {}
-        Tz::Tz(tz) => match tz {
-            chrono_tz::UTC => {
-                tz_postfix = "Z".to_string();
-            }
-            tz => {
-                tz_prefix = format!(";TZID={}", tz.name());
-            }
-        },
+/// Formats `dt` as the value of an iCalendar DATE-TIME, without the property name.
+///
+/// UTC is written with a `Z` suffix, a floating value bare, and any other zone
+/// with its `TZID` parameter.
+pub(crate) fn datetime_to_ical_format(dt: &Zoned) -> String {
+    let local = dt.datetime().strftime("%Y%m%dT%H%M%S");
+    let tz = dt.time_zone();
+    if is_floating(tz) {
+        format!(":{local}")
+    } else if is_utc(tz) {
+        format!(":{local}Z")
+    } else {
+        match tz.iana_name() {
+            Some(name) => format!(";TZID={name}:{local}"),
+            // A zone with no name, e.g. a fixed offset, has no TZID to write,
+            // so the instant is written in UTC instead.
+            None => format!(
+                ":{}Z",
+                dt.with_time_zone(TimeZone::UTC)
+                    .datetime()
+                    .strftime("%Y%m%dT%H%M%S")
+            ),
+        }
     }
+}
 
-    let dt = dt.format("%Y%m%dT%H%M%S");
-    format!("{}:{}{}", tz_prefix, dt, tz_postfix)
+/// Formats `dt` as a bare DATE-TIME value for a list property (RDATE, EXDATE,
+/// UNTIL), where there is no room for a per-value `TZID`: UTC gets a `Z`,
+/// floating is written bare, and any other zone is converted to UTC.
+pub(crate) fn datetime_to_ical_value(dt: &Zoned) -> String {
+    let tz = dt.time_zone();
+    if is_floating(tz) {
+        dt.datetime().strftime("%Y%m%dT%H%M%S").to_string()
+    } else {
+        format!(
+            "{}Z",
+            dt.with_time_zone(TimeZone::UTC)
+                .datetime()
+                .strftime("%Y%m%dT%H%M%S")
+        )
+    }
+}
+
+/// chrono's weekday numbering, which the dateutil-derived masks are built on.
+pub(crate) trait WeekdayExt {
+    /// Monday is 0, Sunday is 6.
+    fn num_days_from_monday(self) -> u32;
+}
+
+impl WeekdayExt for jiff::civil::Weekday {
+    fn num_days_from_monday(self) -> u32 {
+        u32::try_from(self.to_monday_zero_offset()).expect("0-6 is covered by u32")
+    }
 }
