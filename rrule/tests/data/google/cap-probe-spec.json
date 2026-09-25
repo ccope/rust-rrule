@@ -1,0 +1,41 @@
+{
+  "comment": "Probe of Google's 730-instance cap on endless series (schedule-me-9gn).",
+  "series": [
+    {
+      "start": {
+        "dateTime": "2019-01-01T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2019-01-01T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=DAILY"
+      ],
+      "name": "cap-daily-2019-window-2026",
+      "note": "Endless daily from 2019, queried in January 2026: does the 730-instance cap hide it?",
+      "time_min": "2026-01-01T00:00:00Z",
+      "time_max": "2026-01-15T00:00:00Z",
+      "also_list_single_events": true
+    },
+    {
+      "start": {
+        "dateTime": "2019-01-01T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2019-01-01T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=DAILY"
+      ],
+      "name": "cap-daily-2019-window-at-730",
+      "note": "Same series around its 730th instance (2020-12-30)",
+      "time_min": "2020-12-25T00:00:00Z",
+      "time_max": "2021-01-05T00:00:00Z",
+      "also_list_single_events": true
+    }
+  ]
+}

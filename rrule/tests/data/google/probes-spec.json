@@ -1,0 +1,125 @@
+{
+  "comment": "Probes for how Google treats an off-rule DTSTART and YEARLY rules missing BYMONTH (schedule-me-9gn).",
+  "series": [
+    {
+      "name": "probe-dtstart-offrule-until",
+      "note": "DTSTART off-rule, bounded by UNTIL instead of COUNT",
+      "start": {
+        "dateTime": "2027-01-06T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-06T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;BYDAY=MO,TU;UNTIL=20270120T000000Z"
+      ],
+      "time_min": "2027-01-05T00:00:00Z",
+      "time_max": "2027-02-01T00:00:00Z"
+    },
+    {
+      "name": "probe-dtstart-offrule-count1",
+      "note": "COUNT=1 with an off-rule DTSTART: 1 or 2 instances?",
+      "start": {
+        "dateTime": "2027-01-06T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-06T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=1"
+      ],
+      "time_min": "2027-01-05T00:00:00Z",
+      "time_max": "2027-02-01T00:00:00Z"
+    },
+    {
+      "name": "probe-dtstart-offrule-monthly",
+      "note": "Off-rule DTSTART with MONTHLY BYMONTHDAY",
+      "start": {
+        "dateTime": "2027-01-10T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-10T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=MONTHLY;BYMONTHDAY=15;COUNT=3"
+      ],
+      "time_min": "2027-01-09T00:00:00Z",
+      "time_max": "2027-05-01T00:00:00Z"
+    },
+    {
+      "name": "probe-dtstart-offrule-exdated",
+      "note": "EXDATE on the off-rule DTSTART",
+      "start": {
+        "dateTime": "2027-01-06T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-06T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=3",
+        "EXDATE;TZID=America/Los_Angeles:20270106T090000"
+      ],
+      "time_min": "2027-01-05T00:00:00Z",
+      "time_max": "2027-02-01T00:00:00Z"
+    },
+    {
+      "name": "probe-yearly-bymonthday-dtstart-other-day",
+      "note": "YEARLY BYMONTHDAY=15 from 02-10: 15th of February only?",
+      "start": {
+        "dateTime": "2027-02-10T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-02-10T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=YEARLY;BYMONTHDAY=15;COUNT=3"
+      ],
+      "time_min": "2027-02-09T00:00:00Z",
+      "time_max": "2031-01-01T00:00:00Z"
+    },
+    {
+      "name": "probe-yearly-nth-byday-no-bymonth",
+      "note": "YEARLY BYDAY=1MO without BYMONTH: first Monday of the year, or of DTSTART's month?",
+      "start": {
+        "dateTime": "2027-02-01T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-02-01T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=YEARLY;BYDAY=1MO;COUNT=3"
+      ],
+      "time_min": "2027-01-01T00:00:00Z",
+      "time_max": "2031-01-01T00:00:00Z"
+    },
+    {
+      "name": "probe-yearly-bymonthday-list",
+      "note": "Several BYMONTHDAY values without BYMONTH",
+      "start": {
+        "dateTime": "2027-03-01T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-03-01T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=YEARLY;BYMONTHDAY=1,15;COUNT=4"
+      ],
+      "time_min": "2027-02-28T00:00:00Z",
+      "time_max": "2031-01-01T00:00:00Z"
+    }
+  ]
+}

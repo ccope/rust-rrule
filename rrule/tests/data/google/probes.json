@@ -1,0 +1,701 @@
+{
+  "captured_at": "2026-09-25T08:57:23.59268431Z",
+  "series": [
+    {
+      "instances": [
+        {
+          "end": {
+            "dateTime": "2027-01-06T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "muc0uqlk0f95bv1pmt1qlhuc8k_20270106T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-01-06T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "muc0uqlk0f95bv1pmt1qlhuc8k",
+          "start": {
+            "dateTime": "2027-01-06T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2027-01-11T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "muc0uqlk0f95bv1pmt1qlhuc8k_20270111T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-01-11T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "muc0uqlk0f95bv1pmt1qlhuc8k",
+          "start": {
+            "dateTime": "2027-01-11T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2027-01-12T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "muc0uqlk0f95bv1pmt1qlhuc8k_20270112T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-01-12T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "muc0uqlk0f95bv1pmt1qlhuc8k",
+          "start": {
+            "dateTime": "2027-01-12T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2027-01-18T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "muc0uqlk0f95bv1pmt1qlhuc8k_20270118T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-01-18T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "muc0uqlk0f95bv1pmt1qlhuc8k",
+          "start": {
+            "dateTime": "2027-01-18T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2027-01-19T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "muc0uqlk0f95bv1pmt1qlhuc8k_20270119T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-01-19T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "muc0uqlk0f95bv1pmt1qlhuc8k",
+          "start": {
+            "dateTime": "2027-01-19T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        }
+      ],
+      "master": {
+        "end": {
+          "dateTime": "2027-01-06T18:00:00Z",
+          "timeZone": "America/Los_Angeles"
+        },
+        "id": "muc0uqlk0f95bv1pmt1qlhuc8k",
+        "recurrence": [
+          "RRULE:FREQ=WEEKLY;UNTIL=20270120T000000Z;BYDAY=MO,TU"
+        ],
+        "start": {
+          "dateTime": "2027-01-06T17:00:00Z",
+          "timeZone": "America/Los_Angeles"
+        },
+        "status": "confirmed"
+      },
+      "spec": {
+        "end": {
+          "dateTime": "2027-01-06T10:00:00",
+          "timeZone": "America/Los_Angeles"
+        },
+        "name": "probe-dtstart-offrule-until",
+        "note": "DTSTART off-rule, bounded by UNTIL instead of COUNT",
+        "recurrence": [
+          "RRULE:FREQ=WEEKLY;BYDAY=MO,TU;UNTIL=20270120T000000Z"
+        ],
+        "start": {
+          "dateTime": "2027-01-06T09:00:00",
+          "timeZone": "America/Los_Angeles"
+        },
+        "time_max": "2027-02-01T00:00:00Z",
+        "time_min": "2027-01-05T00:00:00Z"
+      }
+    },
+    {
+      "instances": [
+        {
+          "end": {
+            "dateTime": "2027-01-06T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "l498j6alurfr7giq1t13g70pmo_20270106T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-01-06T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "l498j6alurfr7giq1t13g70pmo",
+          "start": {
+            "dateTime": "2027-01-06T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2027-01-11T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "l498j6alurfr7giq1t13g70pmo_20270111T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-01-11T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "l498j6alurfr7giq1t13g70pmo",
+          "start": {
+            "dateTime": "2027-01-11T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        }
+      ],
+      "master": {
+        "end": {
+          "dateTime": "2027-01-06T18:00:00Z",
+          "timeZone": "America/Los_Angeles"
+        },
+        "id": "l498j6alurfr7giq1t13g70pmo",
+        "recurrence": [
+          "RRULE:FREQ=WEEKLY;COUNT=1;BYDAY=MO"
+        ],
+        "start": {
+          "dateTime": "2027-01-06T17:00:00Z",
+          "timeZone": "America/Los_Angeles"
+        },
+        "status": "confirmed"
+      },
+      "spec": {
+        "end": {
+          "dateTime": "2027-01-06T10:00:00",
+          "timeZone": "America/Los_Angeles"
+        },
+        "name": "probe-dtstart-offrule-count1",
+        "note": "COUNT=1 with an off-rule DTSTART: 1 or 2 instances?",
+        "recurrence": [
+          "RRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=1"
+        ],
+        "start": {
+          "dateTime": "2027-01-06T09:00:00",
+          "timeZone": "America/Los_Angeles"
+        },
+        "time_max": "2027-02-01T00:00:00Z",
+        "time_min": "2027-01-05T00:00:00Z"
+      }
+    },
+    {
+      "instances": [
+        {
+          "end": {
+            "dateTime": "2027-01-10T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "gkbb18srq1f2uhe80mkqkjs8dk_20270110T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-01-10T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "gkbb18srq1f2uhe80mkqkjs8dk",
+          "start": {
+            "dateTime": "2027-01-10T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2027-01-15T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "gkbb18srq1f2uhe80mkqkjs8dk_20270115T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-01-15T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "gkbb18srq1f2uhe80mkqkjs8dk",
+          "start": {
+            "dateTime": "2027-01-15T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2027-02-15T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "gkbb18srq1f2uhe80mkqkjs8dk_20270215T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-02-15T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "gkbb18srq1f2uhe80mkqkjs8dk",
+          "start": {
+            "dateTime": "2027-02-15T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2027-03-15T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "gkbb18srq1f2uhe80mkqkjs8dk_20270315T160000Z",
+          "originalStartTime": {
+            "dateTime": "2027-03-15T16:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "gkbb18srq1f2uhe80mkqkjs8dk",
+          "start": {
+            "dateTime": "2027-03-15T16:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        }
+      ],
+      "master": {
+        "end": {
+          "dateTime": "2027-01-10T18:00:00Z",
+          "timeZone": "America/Los_Angeles"
+        },
+        "id": "gkbb18srq1f2uhe80mkqkjs8dk",
+        "recurrence": [
+          "RRULE:FREQ=MONTHLY;COUNT=3;BYMONTHDAY=15"
+        ],
+        "start": {
+          "dateTime": "2027-01-10T17:00:00Z",
+          "timeZone": "America/Los_Angeles"
+        },
+        "status": "confirmed"
+      },
+      "spec": {
+        "end": {
+          "dateTime": "2027-01-10T10:00:00",
+          "timeZone": "America/Los_Angeles"
+        },
+        "name": "probe-dtstart-offrule-monthly",
+        "note": "Off-rule DTSTART with MONTHLY BYMONTHDAY",
+        "recurrence": [
+          "RRULE:FREQ=MONTHLY;BYMONTHDAY=15;COUNT=3"
+        ],
+        "start": {
+          "dateTime": "2027-01-10T09:00:00",
+          "timeZone": "America/Los_Angeles"
+        },
+        "time_max": "2027-05-01T00:00:00Z",
+        "time_min": "2027-01-09T00:00:00Z"
+      }
+    },
+    {
+      "instances": [
+        {
+          "end": {
+            "dateTime": "2027-01-11T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "hes5sc8fjuel98fijrgqhqa380_20270111T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-01-11T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "hes5sc8fjuel98fijrgqhqa380",
+          "start": {
+            "dateTime": "2027-01-11T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2027-01-18T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "hes5sc8fjuel98fijrgqhqa380_20270118T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-01-18T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "hes5sc8fjuel98fijrgqhqa380",
+          "start": {
+            "dateTime": "2027-01-18T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2027-01-25T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "hes5sc8fjuel98fijrgqhqa380_20270125T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-01-25T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "hes5sc8fjuel98fijrgqhqa380",
+          "start": {
+            "dateTime": "2027-01-25T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        }
+      ],
+      "master": {
+        "end": {
+          "dateTime": "2027-01-06T18:00:00Z",
+          "timeZone": "America/Los_Angeles"
+        },
+        "id": "hes5sc8fjuel98fijrgqhqa380",
+        "recurrence": [
+          "EXDATE;TZID=America/Los_Angeles:20270106T090000",
+          "RRULE:FREQ=WEEKLY;COUNT=3;BYDAY=MO"
+        ],
+        "start": {
+          "dateTime": "2027-01-06T17:00:00Z",
+          "timeZone": "America/Los_Angeles"
+        },
+        "status": "confirmed"
+      },
+      "spec": {
+        "end": {
+          "dateTime": "2027-01-06T10:00:00",
+          "timeZone": "America/Los_Angeles"
+        },
+        "name": "probe-dtstart-offrule-exdated",
+        "note": "EXDATE on the off-rule DTSTART",
+        "recurrence": [
+          "RRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=3",
+          "EXDATE;TZID=America/Los_Angeles:20270106T090000"
+        ],
+        "start": {
+          "dateTime": "2027-01-06T09:00:00",
+          "timeZone": "America/Los_Angeles"
+        },
+        "time_max": "2027-02-01T00:00:00Z",
+        "time_min": "2027-01-05T00:00:00Z"
+      }
+    },
+    {
+      "instances": [
+        {
+          "end": {
+            "dateTime": "2027-02-10T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "pbn3kaj4dkf7v9t3nbo2v0ejsg_20270210T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-02-10T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "pbn3kaj4dkf7v9t3nbo2v0ejsg",
+          "start": {
+            "dateTime": "2027-02-10T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2027-02-15T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "pbn3kaj4dkf7v9t3nbo2v0ejsg_20270215T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-02-15T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "pbn3kaj4dkf7v9t3nbo2v0ejsg",
+          "start": {
+            "dateTime": "2027-02-15T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2028-02-15T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "pbn3kaj4dkf7v9t3nbo2v0ejsg_20280215T170000Z",
+          "originalStartTime": {
+            "dateTime": "2028-02-15T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "pbn3kaj4dkf7v9t3nbo2v0ejsg",
+          "start": {
+            "dateTime": "2028-02-15T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2029-02-15T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "pbn3kaj4dkf7v9t3nbo2v0ejsg_20290215T170000Z",
+          "originalStartTime": {
+            "dateTime": "2029-02-15T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "pbn3kaj4dkf7v9t3nbo2v0ejsg",
+          "start": {
+            "dateTime": "2029-02-15T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        }
+      ],
+      "master": {
+        "end": {
+          "dateTime": "2027-02-10T18:00:00Z",
+          "timeZone": "America/Los_Angeles"
+        },
+        "id": "pbn3kaj4dkf7v9t3nbo2v0ejsg",
+        "recurrence": [
+          "RRULE:FREQ=YEARLY;COUNT=3;BYMONTHDAY=15"
+        ],
+        "start": {
+          "dateTime": "2027-02-10T17:00:00Z",
+          "timeZone": "America/Los_Angeles"
+        },
+        "status": "confirmed"
+      },
+      "spec": {
+        "end": {
+          "dateTime": "2027-02-10T10:00:00",
+          "timeZone": "America/Los_Angeles"
+        },
+        "name": "probe-yearly-bymonthday-dtstart-other-day",
+        "note": "YEARLY BYMONTHDAY=15 from 02-10: 15th of February only?",
+        "recurrence": [
+          "RRULE:FREQ=YEARLY;BYMONTHDAY=15;COUNT=3"
+        ],
+        "start": {
+          "dateTime": "2027-02-10T09:00:00",
+          "timeZone": "America/Los_Angeles"
+        },
+        "time_max": "2031-01-01T00:00:00Z",
+        "time_min": "2027-02-09T00:00:00Z"
+      }
+    },
+    {
+      "instances": [
+        {
+          "end": {
+            "dateTime": "2027-02-01T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "nbloia22hs3m5gu3ptcsp5gjr4_20270201T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-02-01T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "nbloia22hs3m5gu3ptcsp5gjr4",
+          "start": {
+            "dateTime": "2027-02-01T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2028-01-03T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "nbloia22hs3m5gu3ptcsp5gjr4_20280103T170000Z",
+          "originalStartTime": {
+            "dateTime": "2028-01-03T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "nbloia22hs3m5gu3ptcsp5gjr4",
+          "start": {
+            "dateTime": "2028-01-03T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2029-01-01T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "nbloia22hs3m5gu3ptcsp5gjr4_20290101T170000Z",
+          "originalStartTime": {
+            "dateTime": "2029-01-01T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "nbloia22hs3m5gu3ptcsp5gjr4",
+          "start": {
+            "dateTime": "2029-01-01T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2030-01-07T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "nbloia22hs3m5gu3ptcsp5gjr4_20300107T170000Z",
+          "originalStartTime": {
+            "dateTime": "2030-01-07T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "nbloia22hs3m5gu3ptcsp5gjr4",
+          "start": {
+            "dateTime": "2030-01-07T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        }
+      ],
+      "master": {
+        "end": {
+          "dateTime": "2027-02-01T18:00:00Z",
+          "timeZone": "America/Los_Angeles"
+        },
+        "id": "nbloia22hs3m5gu3ptcsp5gjr4",
+        "recurrence": [
+          "RRULE:FREQ=YEARLY;COUNT=3;BYDAY=1MO"
+        ],
+        "start": {
+          "dateTime": "2027-02-01T17:00:00Z",
+          "timeZone": "America/Los_Angeles"
+        },
+        "status": "confirmed"
+      },
+      "spec": {
+        "end": {
+          "dateTime": "2027-02-01T10:00:00",
+          "timeZone": "America/Los_Angeles"
+        },
+        "name": "probe-yearly-nth-byday-no-bymonth",
+        "note": "YEARLY BYDAY=1MO without BYMONTH: first Monday of the year, or of DTSTART's month?",
+        "recurrence": [
+          "RRULE:FREQ=YEARLY;BYDAY=1MO;COUNT=3"
+        ],
+        "start": {
+          "dateTime": "2027-02-01T09:00:00",
+          "timeZone": "America/Los_Angeles"
+        },
+        "time_max": "2031-01-01T00:00:00Z",
+        "time_min": "2027-01-01T00:00:00Z"
+      }
+    },
+    {
+      "instances": [
+        {
+          "end": {
+            "dateTime": "2027-03-01T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "nb1k4dc55id01mev5n7egp97rk_20270301T170000Z",
+          "originalStartTime": {
+            "dateTime": "2027-03-01T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "nb1k4dc55id01mev5n7egp97rk",
+          "start": {
+            "dateTime": "2027-03-01T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2027-03-15T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "nb1k4dc55id01mev5n7egp97rk_20270315T160000Z",
+          "originalStartTime": {
+            "dateTime": "2027-03-15T16:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "nb1k4dc55id01mev5n7egp97rk",
+          "start": {
+            "dateTime": "2027-03-15T16:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2028-03-01T18:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "nb1k4dc55id01mev5n7egp97rk_20280301T170000Z",
+          "originalStartTime": {
+            "dateTime": "2028-03-01T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "nb1k4dc55id01mev5n7egp97rk",
+          "start": {
+            "dateTime": "2028-03-01T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        },
+        {
+          "end": {
+            "dateTime": "2028-03-15T17:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "id": "nb1k4dc55id01mev5n7egp97rk_20280315T160000Z",
+          "originalStartTime": {
+            "dateTime": "2028-03-15T16:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "recurringEventId": "nb1k4dc55id01mev5n7egp97rk",
+          "start": {
+            "dateTime": "2028-03-15T16:00:00Z",
+            "timeZone": "America/Los_Angeles"
+          },
+          "status": "confirmed"
+        }
+      ],
+      "master": {
+        "end": {
+          "dateTime": "2027-03-01T18:00:00Z",
+          "timeZone": "America/Los_Angeles"
+        },
+        "id": "nb1k4dc55id01mev5n7egp97rk",
+        "recurrence": [
+          "RRULE:FREQ=YEARLY;COUNT=4;BYMONTHDAY=1,15"
+        ],
+        "start": {
+          "dateTime": "2027-03-01T17:00:00Z",
+          "timeZone": "America/Los_Angeles"
+        },
+        "status": "confirmed"
+      },
+      "spec": {
+        "end": {
+          "dateTime": "2027-03-01T10:00:00",
+          "timeZone": "America/Los_Angeles"
+        },
+        "name": "probe-yearly-bymonthday-list",
+        "note": "Several BYMONTHDAY values without BYMONTH",
+        "recurrence": [
+          "RRULE:FREQ=YEARLY;BYMONTHDAY=1,15;COUNT=4"
+        ],
+        "start": {
+          "dateTime": "2027-03-01T09:00:00",
+          "timeZone": "America/Los_Angeles"
+        },
+        "time_max": "2031-01-01T00:00:00Z",
+        "time_min": "2027-02-28T00:00:00Z"
+      }
+    }
+  ]
+}

@@ -8,6 +8,9 @@
 use rrule::{RRuleSet, TimeZone, Zoned};
 use serde_json::Value;
 
+/// Google's expansion limit for a single series.
+const GOOGLE_CAP: usize = 730;
+
 /// Series where the crate is known to disagree with Google, and why.
 const KNOWN: &[(&str, &str)] = &[
     (
@@ -15,6 +18,39 @@ const KNOWN: &[(&str, &str)] = &[
         "Google adds a DTSTART the rule does not generate as an extra instance, outside COUNT; \
          the crate follows dateutil and drops it",
     ),
+    (
+        "probe-dtstart-offrule-until",
+        "off-rule DTSTART, as la-dtstart-not-in-byday",
+    ),
+    (
+        "probe-dtstart-offrule-count1",
+        "off-rule DTSTART, as la-dtstart-not-in-byday",
+    ),
+    (
+        "probe-dtstart-offrule-monthly",
+        "off-rule DTSTART, as la-dtstart-not-in-byday",
+    ),
+    (
+        "probe-yearly-nth-byday-no-bymonth",
+        "off-rule DTSTART, as la-dtstart-not-in-byday",
+    ),
+    (
+        "probe-yearly-bymonthday-dtstart-other-day",
+        "off-rule DTSTART plus BYMONTH from DTSTART",
+    ),
+    (
+        "probe-yearly-bymonthday-list",
+        "BYMONTH from DTSTART, as la-yearly-bymonthday-no-bymonth",
+    ),
+    (
+        "cap-daily-2019-window-2026",
+        "Google's 730-instance cap: nothing after the series' 730th instance, in any window",
+    ),
+    (
+        "cap-daily-2019-window-at-730",
+        "Google's 730-instance cap: the window straddles the 730th instance",
+    ),
+    ("real-018", "off-rule DTSTART, as la-dtstart-not-in-byday"),
     (
         "la-yearly-bymonthday-no-bymonth",
         "Google takes a missing BYMONTH from DTSTART (RFC 5545: parts the rule omits come from \
@@ -47,13 +83,20 @@ fn expand(series: &Value) -> Result<Vec<String>, String> {
             true,
         )
     } else {
-        let local = start["dateTime"]
+        let raw = start["dateTime"]
             .as_str()
             .ok_or("spec start has no dateTime")?;
-        let local = local.replace(['-', ':'], "");
         let tz = start["timeZone"]
             .as_str()
             .ok_or("spec start has no timeZone")?;
+        // An archived start carries an offset; express it as wall-clock time in its zone.
+        let local = match raw.parse::<jiff::Timestamp>() {
+            Ok(ts) => ts
+                .to_zoned(TimeZone::get(tz).map_err(|e| e.to_string())?)
+                .strftime("%Y%m%dT%H%M%S")
+                .to_string(),
+            Err(_) => raw.replace(['-', ':'], ""),
+        };
         (format!("DTSTART;TZID={tz}:{local}"), false)
     };
     let mut text = dtstart;
@@ -66,6 +109,10 @@ fn expand(series: &Value) -> Result<Vec<String>, String> {
         text.push_str(line.as_str().unwrap_or_default());
     }
     let set: RRuleSet = text.parse().map_err(|e| format!("{e}: {text}"))?;
+    let time_min: jiff::Timestamp = spec["time_min"]
+        .as_str()
+        .and_then(|t| t.parse().ok())
+        .ok_or("spec has no time_min")?;
     let time_max: jiff::Timestamp = spec["time_max"]
         .as_str()
         .and_then(|t| t.parse().ok())
@@ -81,6 +128,11 @@ fn expand(series: &Value) -> Result<Vec<String>, String> {
                 .map_or(true, |d| d.timestamp() >= time_max)
         {
             break;
+        }
+        // Every spec window opens well before an occurrence's start, so a start
+        // before it means the occurrence lies outside the window.
+        if z.timestamp() < time_min && !all_day {
+            continue;
         }
         out.push(crate_slot(&z, all_day));
         if out.len() > 100_000 {
@@ -107,7 +159,10 @@ fn run(path: &std::path::Path) -> (usize, usize, Vec<String>) {
             .collect();
         google.sort();
         let ours = expand(series);
-        let ok = matches!(&ours, Ok(o) if *o == google);
+        // Google stops expanding a series after 730 instances, counted from its start,
+        // in both events.instances and events.list?singleEvents=true.
+        let capped = |o: &Vec<String>| google.len() == GOOGLE_CAP && o.starts_with(&google);
+        let ok = matches!(&ours, Ok(o) if *o == google || capped(o));
         if ok {
             pass += 1;
             continue;
