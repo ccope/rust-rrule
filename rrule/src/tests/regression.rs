@@ -167,3 +167,15 @@ fn dtstart_before_year_1_is_rejected() {
         .parse::<RRuleSet>()
         .is_ok());
 }
+
+// RRuleResult::limited says the result may be incomplete; a rule that never
+// matches runs into the iteration guard, which has to show up there.
+#[test]
+fn hitting_the_iteration_guard_is_reported_as_limited() {
+    let result = "DTSTART:20200101T090000Z\nRRULE:FREQ=DAILY;BYMONTH=2;BYMONTHDAY=30"
+        .parse::<RRuleSet>()
+        .unwrap()
+        .all(10);
+    assert!(result.dates.is_empty());
+    assert!(result.limited);
+}

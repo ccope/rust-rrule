@@ -252,7 +252,11 @@ impl IntoIterator for &RRuleSet {
 
 impl WasLimited for RRuleSetIter {
     fn was_limited(&self) -> bool {
+        // A rule iterator that hit the guard just stops yielding, so its flag is
+        // the only record that the set's dates may be incomplete.
         self.was_limited
+            || self.rrule_iters.iter().any(WasLimited::was_limited)
+            || self.exrules.iter().any(WasLimited::was_limited)
     }
 }
 
