@@ -220,3 +220,18 @@ pub fn take_data_isize(input: &mut &[u8]) -> isize {
     *input = rest;
     isize::from_be_bytes(int_bytes.try_into().expect("Failed to convert to u8"))
 }
+
+/// Uses 1 byte + [`take_datetime`]: a DTSTART in one of a few zones, chosen to reach
+/// DST gaps and folds (including a 30-minute one) as well as UTC and floating time.
+pub fn take_zoned_start(input: &mut &[u8]) -> Zoned {
+    let zone = match take_byte(input) % 7 {
+        0 => TimeZone::UTC,
+        1 => TimeZone::unknown(),
+        2 => TimeZone::get("America/Los_Angeles").unwrap(),
+        3 => TimeZone::get("America/New_York").unwrap(),
+        4 => TimeZone::get("Europe/London").unwrap(),
+        5 => TimeZone::get("Australia/Lord_Howe").unwrap(),
+        _ => TimeZone::get("Asia/Kolkata").unwrap(),
+    };
+    take_datetime(input).with_time_zone(zone)
+}

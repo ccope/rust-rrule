@@ -10,8 +10,11 @@ use std::str;
 
 #[allow(clippy::single_match)]
 fn main() {
-    let fuzz_selector: u8 = 2;
-    // let fuzz_target
+    // RRULE_FUZZ_TARGET picks the target below; the default stays the structured one.
+    let fuzz_selector: u8 = std::env::var("RRULE_FUZZ_TARGET")
+        .ok()
+        .and_then(|t| t.parse().ok())
+        .unwrap_or(2);
     match fuzz_selector {
         // Fuzz the RRuleSet from string
         0 => fuzz!(|data: &[u8]| {

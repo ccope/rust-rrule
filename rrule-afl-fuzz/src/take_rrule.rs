@@ -76,7 +76,7 @@ pub fn take_rrule_from_data(mut data: &[u8]) -> Option<RRuleSet> {
         0 => Some(take_data_i16(&mut data)),
         _ => None,
     };
-    let dt_start = take_datetime(&mut data);
+    let dt_start = take_zoned_start(&mut data);
 
     let mut rrule = RRule::new(freq)
         .interval(interval)
