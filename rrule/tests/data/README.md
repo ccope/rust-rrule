@@ -128,3 +128,18 @@ case is an error, not a failure.
 - `RecurSpec` features about parsing, string forms, builders and validation are not
   extracted. From `duplicate candidates …` only the `getDates` comparison is taken,
   not the `getNextDate` assertions.
+
+## google/
+
+Google Calendar's own expansion, the reference the others are checked against.
+`synthetic-spec.json` lists recurring series that each isolate one question
+(its `note` says which). schedule-me's
+`devtool recurrence-fixtures --spec synthetic-spec.json --out synthetic.json`
+writes them to a scratch calendar in a test account, records the master Google
+echoes back and every instance (cancelled ones included) over `time_min` to
+`time_max`, keeping only scheduling fields, and deletes the calendar again.
+`tests/google.rs` rebuilds each series from the spec's DTSTART and Google's
+recurrence lines and compares against each instance's `originalStartTime`.
+
+Captures derived from a real account's calendars go in `google/private/`,
+which git ignores; the runner includes them when present.

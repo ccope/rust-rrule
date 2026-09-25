@@ -1,0 +1,492 @@
+{
+  "comment": "Synthetic series for devtool recurrence-fixtures (schedule-me-9gn). Each isolates one expansion question; `note` says which.",
+  "series": [
+    {
+      "name": "la-daily-0230-spring-gap",
+      "note": "02:30 does not exist on 2027-03-14",
+      "start": {
+        "dateTime": "2027-03-10T02:30:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-03-10T03:30:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=DAILY;COUNT=8"
+      ],
+      "time_min": "2027-03-09T00:00:00Z",
+      "time_max": "2027-03-20T00:00:00Z"
+    },
+    {
+      "name": "la-daily-0130-fall-fold",
+      "note": "01:30 happens twice on 2026-11-01",
+      "start": {
+        "dateTime": "2026-10-29T01:30:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2026-10-29T02:30:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=DAILY;COUNT=6"
+      ],
+      "time_min": "2026-10-28T00:00:00Z",
+      "time_max": "2026-11-06T00:00:00Z"
+    },
+    {
+      "name": "ny-dtstart-in-gap",
+      "note": "DTSTART itself falls in the gap: are later instances 02:30 or 03:30?",
+      "start": {
+        "dateTime": "2027-03-14T02:30:00",
+        "timeZone": "America/New_York"
+      },
+      "end": {
+        "dateTime": "2027-03-14T03:30:00",
+        "timeZone": "America/New_York"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;COUNT=4"
+      ],
+      "time_min": "2027-03-13T00:00:00Z",
+      "time_max": "2027-04-12T00:00:00Z"
+    },
+    {
+      "name": "ny-dtstart-in-fold",
+      "note": "DTSTART itself is a repeated local time",
+      "start": {
+        "dateTime": "2026-11-01T01:30:00",
+        "timeZone": "America/New_York"
+      },
+      "end": {
+        "dateTime": "2026-11-01T02:30:00",
+        "timeZone": "America/New_York"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;COUNT=3"
+      ],
+      "time_min": "2026-10-31T00:00:00Z",
+      "time_max": "2026-11-20T00:00:00Z"
+    },
+    {
+      "name": "ny-weekly-sun-0230-both-transitions",
+      "note": "Sunday 02:30 across the fold and the gap",
+      "start": {
+        "dateTime": "2026-10-04T02:30:00",
+        "timeZone": "America/New_York"
+      },
+      "end": {
+        "dateTime": "2026-10-04T03:30:00",
+        "timeZone": "America/New_York"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;BYDAY=SU;UNTIL=20270425T000000Z"
+      ],
+      "time_min": "2026-10-03T00:00:00Z",
+      "time_max": "2027-04-30T00:00:00Z"
+    },
+    {
+      "name": "la-until-exact",
+      "note": "UNTIL equals the 2027-01-25 occurrence: inclusive?",
+      "start": {
+        "dateTime": "2027-01-04T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-04T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;BYDAY=MO;UNTIL=20270125T170000Z"
+      ],
+      "time_min": "2027-01-03T00:00:00Z",
+      "time_max": "2027-02-15T00:00:00Z"
+    },
+    {
+      "name": "la-until-one-second-before",
+      "note": "UNTIL one second before the 2027-01-25 occurrence",
+      "start": {
+        "dateTime": "2027-01-04T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-04T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;BYDAY=MO;UNTIL=20270125T165959Z"
+      ],
+      "time_min": "2027-01-03T00:00:00Z",
+      "time_max": "2027-02-15T00:00:00Z"
+    },
+    {
+      "name": "la-until-across-dst",
+      "note": "UNTIL 16:30Z: the 03-22 09:00 PDT occurrence is 16:00Z, inside it",
+      "start": {
+        "dateTime": "2027-02-01T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-02-01T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;BYDAY=MO;UNTIL=20270322T163000Z"
+      ],
+      "time_min": "2027-01-31T00:00:00Z",
+      "time_max": "2027-04-15T00:00:00Z"
+    },
+    {
+      "name": "la-count-with-exdate",
+      "note": "Does an EXDATE use up a COUNT slot?",
+      "start": {
+        "dateTime": "2027-01-05T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-05T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;BYDAY=TU,TH;COUNT=8",
+        "EXDATE;TZID=America/Los_Angeles:20270112T090000"
+      ],
+      "time_min": "2027-01-04T00:00:00Z",
+      "time_max": "2027-02-15T00:00:00Z"
+    },
+    {
+      "name": "la-cancelled-exception",
+      "note": "The same instance cancelled through the API: EXDATE or cancelled instance?",
+      "start": {
+        "dateTime": "2027-01-05T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-05T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;BYDAY=TU,TH;COUNT=8"
+      ],
+      "time_min": "2027-01-04T00:00:00Z",
+      "time_max": "2027-02-15T00:00:00Z",
+      "cancel": [
+        "2027-01-12T09:00:00-08:00"
+      ]
+    },
+    {
+      "name": "la-moved-exception",
+      "note": "One instance moved: originalStartTime keeps its slot",
+      "start": {
+        "dateTime": "2027-01-05T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-05T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;BYDAY=TU,TH;COUNT=8"
+      ],
+      "time_min": "2027-01-04T00:00:00Z",
+      "time_max": "2027-02-15T00:00:00Z",
+      "move": [
+        {
+          "original": "2027-01-14T09:00:00-08:00",
+          "start": {
+            "dateTime": "2027-01-15T10:00:00",
+            "timeZone": "America/Los_Angeles"
+          },
+          "end": {
+            "dateTime": "2027-01-15T11:00:00",
+            "timeZone": "America/Los_Angeles"
+          }
+        }
+      ]
+    },
+    {
+      "name": "allday-daily-exdate-date",
+      "note": "All-day series with date-valued EXDATEs",
+      "start": {
+        "date": "2027-04-01"
+      },
+      "end": {
+        "date": "2027-04-02"
+      },
+      "recurrence": [
+        "RRULE:FREQ=DAILY;COUNT=5",
+        "EXDATE;VALUE=DATE:20270402,20270404"
+      ],
+      "time_min": "2027-03-31T00:00:00Z",
+      "time_max": "2027-04-20T00:00:00Z"
+    },
+    {
+      "name": "allday-yearly-feb29",
+      "note": "Feb 29 yearly: skip non-leap years?",
+      "start": {
+        "date": "2028-02-29"
+      },
+      "end": {
+        "date": "2028-03-01"
+      },
+      "recurrence": [
+        "RRULE:FREQ=YEARLY;COUNT=3"
+      ],
+      "time_min": "2028-02-28T00:00:00Z",
+      "time_max": "2041-01-01T00:00:00Z"
+    },
+    {
+      "name": "allday-weekly-until-date",
+      "note": "All-day series with a DATE UNTIL on an occurrence",
+      "start": {
+        "date": "2027-01-04"
+      },
+      "end": {
+        "date": "2027-01-05"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;UNTIL=20270201"
+      ],
+      "time_min": "2027-01-03T00:00:00Z",
+      "time_max": "2027-03-01T00:00:00Z"
+    },
+    {
+      "name": "la-dtstart-not-in-byday",
+      "note": "DTSTART is a Wednesday; the rule says MO,TU",
+      "start": {
+        "dateTime": "2027-01-06T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-06T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;BYDAY=MO,TU;COUNT=4"
+      ],
+      "time_min": "2027-01-05T00:00:00Z",
+      "time_max": "2027-02-15T00:00:00Z"
+    },
+    {
+      "name": "la-byweekno-without-byday",
+      "note": "libical: DTSTART's weekday; dateutil: whole weeks",
+      "start": {
+        "dateTime": "2027-01-07T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-07T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=YEARLY;BYWEEKNO=1,2;COUNT=6"
+      ],
+      "time_min": "2027-01-01T00:00:00Z",
+      "time_max": "2031-01-01T00:00:00Z"
+    },
+    {
+      "name": "la-yearly-bymonthday-no-bymonth",
+      "note": "libical: February only; dateutil: every month",
+      "start": {
+        "dateTime": "2027-02-15T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-02-15T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=YEARLY;BYMONTHDAY=15;COUNT=4"
+      ],
+      "time_min": "2027-02-14T00:00:00Z",
+      "time_max": "2031-01-01T00:00:00Z"
+    },
+    {
+      "name": "allday-daily-byhour",
+      "note": "Time BY-parts on a date-only series",
+      "start": {
+        "date": "2027-05-01"
+      },
+      "end": {
+        "date": "2027-05-02"
+      },
+      "recurrence": [
+        "RRULE:FREQ=DAILY;BYHOUR=9;COUNT=3"
+      ],
+      "time_min": "2027-04-30T00:00:00Z",
+      "time_max": "2027-05-10T00:00:00Z"
+    },
+    {
+      "name": "la-monthly-last-friday",
+      "note": "Last Friday of the month",
+      "start": {
+        "dateTime": "2027-01-29T12:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-29T13:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=MONTHLY;BYDAY=-1FR;COUNT=6"
+      ],
+      "time_min": "2027-01-28T00:00:00Z",
+      "time_max": "2027-08-01T00:00:00Z"
+    },
+    {
+      "name": "la-monthly-31st",
+      "note": "31st: short months are skipped",
+      "start": {
+        "dateTime": "2027-01-31T12:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-31T13:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=MONTHLY;BYMONTHDAY=31;COUNT=6"
+      ],
+      "time_min": "2027-01-30T00:00:00Z",
+      "time_max": "2028-02-01T00:00:00Z"
+    },
+    {
+      "name": "la-monthly-last-weekday-bysetpos",
+      "note": "Last weekday of the month via BYSETPOS",
+      "start": {
+        "dateTime": "2027-01-29T12:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-29T13:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1;COUNT=6"
+      ],
+      "time_min": "2027-01-28T00:00:00Z",
+      "time_max": "2027-08-01T00:00:00Z"
+    },
+    {
+      "name": "la-yearly-4th-thursday-november",
+      "note": "US Thanksgiving",
+      "start": {
+        "dateTime": "2026-11-26T12:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2026-11-26T13:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=4TH;COUNT=4"
+      ],
+      "time_min": "2026-11-25T00:00:00Z",
+      "time_max": "2030-12-01T00:00:00Z"
+    },
+    {
+      "name": "la-rdate-extra-and-duplicate",
+      "note": "One extra RDATE, one equal to a rule occurrence",
+      "start": {
+        "dateTime": "2027-01-04T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-04T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;COUNT=3",
+        "RDATE;TZID=America/Los_Angeles:20270106T090000,20270111T090000"
+      ],
+      "time_min": "2027-01-03T00:00:00Z",
+      "time_max": "2027-02-01T00:00:00Z"
+    },
+    {
+      "name": "la-weekly-infinite",
+      "note": "Endless series over three years, both DST directions",
+      "start": {
+        "dateTime": "2026-10-05T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2026-10-05T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;BYDAY=MO,WE"
+      ],
+      "time_min": "2026-10-04T00:00:00Z",
+      "time_max": "2029-10-05T00:00:00Z"
+    },
+    {
+      "name": "la-biweekly-wkst-mo",
+      "note": "RFC 5545 WKST example, WKST=MO",
+      "start": {
+        "dateTime": "2027-01-05T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-05T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=TU,SU;WKST=MO;COUNT=6"
+      ],
+      "time_min": "2027-01-04T00:00:00Z",
+      "time_max": "2027-03-15T00:00:00Z"
+    },
+    {
+      "name": "la-biweekly-wkst-su",
+      "note": "RFC 5545 WKST example, WKST=SU",
+      "start": {
+        "dateTime": "2027-01-05T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-05T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=TU,SU;WKST=SU;COUNT=6"
+      ],
+      "time_min": "2027-01-04T00:00:00Z",
+      "time_max": "2027-03-15T00:00:00Z"
+    },
+    {
+      "name": "london-daily-0130-spring-gap",
+      "note": "01:30 does not exist on 2027-03-28 in London",
+      "start": {
+        "dateTime": "2027-03-26T01:30:00",
+        "timeZone": "Europe/London"
+      },
+      "end": {
+        "dateTime": "2027-03-26T02:30:00",
+        "timeZone": "Europe/London"
+      },
+      "recurrence": [
+        "RRULE:FREQ=DAILY;COUNT=5"
+      ],
+      "time_min": "2027-03-25T00:00:00Z",
+      "time_max": "2027-04-02T00:00:00Z"
+    },
+    {
+      "name": "lordhowe-daily-0215-half-hour-gap",
+      "note": "Lord Howe skips 02:00-02:30 on 2026-10-04",
+      "start": {
+        "dateTime": "2026-10-02T02:15:00",
+        "timeZone": "Australia/Lord_Howe"
+      },
+      "end": {
+        "dateTime": "2026-10-02T03:15:00",
+        "timeZone": "Australia/Lord_Howe"
+      },
+      "recurrence": [
+        "RRULE:FREQ=DAILY;COUNT=5"
+      ],
+      "time_min": "2026-10-01T00:00:00Z",
+      "time_max": "2026-10-08T00:00:00Z"
+    }
+  ]
+}
