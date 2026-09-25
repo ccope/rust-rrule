@@ -103,6 +103,8 @@
 #![warn(missing_docs)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
+#[cfg(feature = "chrono")]
+pub mod chrono;
 mod core;
 mod error;
 mod iter;

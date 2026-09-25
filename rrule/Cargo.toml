@@ -14,6 +14,8 @@ edition.workspace = true
 
 [dependencies]
 jiff = "0.2.35"
+chrono = { version = "0.4.39", optional = true, default-features = false, features = ["std"] }
+chrono-tz = { version = "0.10.1", optional = true }
 log = "0.4.25"
 regex = { version = "1.11.1", default-features = false, features = ["perf", "std"] }
 clap = { version = "4.5.26", optional = true, features = ["derive"] }
@@ -39,6 +41,9 @@ cli-tool = ["clap"]
 
 # Enable serde for some of the public structs.
 serde = ["serde_with", "jiff/serde"]
+
+# Conversions between `jiff::Zoned` and chrono date-times, for callers still on chrono.
+chrono = ["dep:chrono", "dep:chrono-tz"]
 
 # Allows EXRULE's to be used in the `RRuleSet`.
 exrule = []

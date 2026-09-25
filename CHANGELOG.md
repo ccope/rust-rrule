@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `chrono-tz` are no longer dependencies. `rrule::Tz` is gone; zones are
   `jiff::tz::TimeZone`, re-exported as `rrule::TimeZone` along with `Zoned` and
   `Weekday` (now `jiff::civil::Weekday`).
+- The `chrono` feature adds `rrule::chrono`, which converts between `Zoned` and
+  `chrono::DateTime` (`chrono_tz::Tz`, `Utc`, `FixedOffset`) at the API boundary.
 - `RRule::by_month` takes month numbers (`&[u8]`, 1-12) instead of `chrono::Month`.
 - A floating DTSTART, RDATE, EXDATE or UNTIL (no `TZID`, no `Z`) is placed in
   `jiff::tz::TimeZone::unknown()`, which behaves like UTC, instead of the
