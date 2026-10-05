@@ -1,5 +1,5 @@
 use crate::core::utils::collect_with_error;
-use crate::core::{datetime_to_ical_format, datetime_to_ical_value};
+use crate::core::{datetime_to_ical_format, datetime_to_ical_value, is_floating};
 use crate::iter::DEFAULT_ITERATION_LIMIT;
 use crate::parser::{ContentLine, Grammar};
 use crate::{ParseError, RRule, RRuleError};
@@ -364,52 +364,70 @@ impl FromStr for RRuleSet {
     }
 }
 
+impl RRuleSet {
+    /// An RDATE or EXDATE list with its VALUE parameter: DATEs when DTSTART is a DATE and
+    /// every value is a floating midnight, as a parsed DATE is; DATE-TIMEs otherwise.
+    fn ical_date_list(&self, dates: &[Zoned]) -> String {
+        if dates.is_empty() {
+            return String::new();
+        }
+        let as_dates = self.dt_start_is_date
+            && dates
+                .iter()
+                .all(|d| is_floating(d.time_zone()) && d.time() == jiff::civil::Time::midnight());
+        if as_dates {
+            let list: Vec<_> = dates.iter().map(ical_date).collect();
+            format!("VALUE=DATE:{}", list.join(","))
+        } else {
+            // TODO: check if original VALUE prop was PERIOD
+            let list: Vec<_> = dates.iter().map(datetime_to_ical_value).collect();
+            format!("VALUE=DATE-TIME:{}", list.join(","))
+        }
+    }
+}
+
+fn ical_date(dt: &Zoned) -> String {
+    dt.date().strftime("%Y%m%d").to_string()
+}
+
 impl Display for RRuleSet {
     /// Prints a valid set of iCalendar properties which can be used to create a new [`RRuleSet`] later.
     /// You may use the generated string to create a new iCalendar component, like VEVENT.
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let start_datetime = format!("DTSTART{}", datetime_to_ical_format(&self.dt_start));
+        let start_datetime = if self.dt_start_is_date {
+            format!("DTSTART;VALUE=DATE:{}", ical_date(&self.dt_start))
+        } else {
+            format!("DTSTART{}", datetime_to_ical_format(&self.dt_start))
+        };
 
         let mut rrules = self
             .rrule
             .iter()
-            .map(|rrule| format!("RRULE:{rrule}"))
+            .map(|rrule| format!("RRULE:{}", rrule.to_ical(self.dt_start_is_date)))
             .collect::<Vec<_>>()
             .join("\n");
         if !rrules.is_empty() {
             rrules = format!("\n{rrules}");
         }
 
-        let mut rdates = self
-            .rdate
-            .iter()
-            .map(datetime_to_ical_value)
-            .collect::<Vec<_>>()
-            .join(",");
+        let mut rdates = self.ical_date_list(&self.rdate);
         if !rdates.is_empty() {
-            // TODO: check if original VALUE prop was DATE or PERIOD
-            rdates = format!("\nRDATE;VALUE=DATE-TIME:{rdates}");
+            rdates = format!("\nRDATE;{rdates}");
         }
 
         let mut exrules = self
             .exrule
             .iter()
-            .map(|exrule| format!("EXRULE:{exrule}"))
+            .map(|exrule| format!("EXRULE:{}", exrule.to_ical(self.dt_start_is_date)))
             .collect::<Vec<_>>()
             .join("\n");
         if !exrules.is_empty() {
             exrules = format!("\n{exrules}");
         }
 
-        let mut exdates = self
-            .exdate
-            .iter()
-            .map(datetime_to_ical_value)
-            .collect::<Vec<_>>()
-            .join(",");
+        let mut exdates = self.ical_date_list(&self.exdate);
         if !exdates.is_empty() {
-            // TODO: check if original VALUE prop was DATE or PERIOD
-            exdates = format!("\nEXDATE;VALUE=DATE-TIME:{exdates}");
+            exdates = format!("\nEXDATE;{exdates}");
         }
 
         write!(f, "{start_datetime}{rrules}{rdates}{exrules}{exdates}")

@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- A set whose DTSTART is a DATE is written back with `DTSTART;VALUE=DATE`, a
+  DATE UNTIL, `VALUE=DATE` RDATE and EXDATE lists, and without the
+  `BYHOUR=0;BYMINUTE=0;BYSECOND=0` filled in from the midnight start, which
+  RFC 5545 forbids beside a DATE. It used to be written as a floating
+  `T000000` DATE-TIME.
 - `RRuleSet::dtstart_always_occurs(true)` makes a DTSTART the rules do not
   generate an occurrence anyway, as an implicit RDATE outside COUNT that EXDATE
   can remove (RFC 2445, Google Calendar). Off by default, which keeps

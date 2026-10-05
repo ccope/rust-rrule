@@ -718,3 +718,53 @@ fn all_day_series_honours_date_valued_exdates() {
         .collect();
     assert_eq!(days, ["2026-04-01", "2026-04-03", "2026-04-05"]);
 }
+
+// A DATE DTSTART is written back as a DATE, with its UNTIL, RDATEs and EXDATEs, and
+// without the midnight BYHOUR/BYMINUTE/BYSECOND that RFC 5545 forbids beside it.
+#[test]
+fn a_date_start_is_written_back_as_dates() {
+    let text = "DTSTART;VALUE=DATE:20270501\n\
+        RRULE:FREQ=DAILY;UNTIL=20270510\n\
+        RDATE;VALUE=DATE:20270601\n\
+        EXDATE;VALUE=DATE:20270503";
+    let set = text.parse::<RRuleSet>().unwrap();
+    assert_eq!(set.to_string(), text);
+    assert_eq!(
+        set.to_string().parse::<RRuleSet>().unwrap().all(20).dates,
+        set.all(20).dates
+    );
+}
+
+#[test]
+fn a_bare_date_start_is_written_back_as_a_date() {
+    let set = "DTSTART:20270501\nRRULE:FREQ=WEEKLY;COUNT=2"
+        .parse::<RRuleSet>()
+        .unwrap();
+    assert_eq!(
+        set.to_string(),
+        "DTSTART;VALUE=DATE:20270501\nRRULE:FREQ=WEEKLY;COUNT=2;BYDAY=SA"
+    );
+}
+
+// Applied by default, so dropping it would change the occurrences.
+#[test]
+fn a_date_start_keeps_a_byhour_other_than_midnight_when_written_back() {
+    let set = "DTSTART;VALUE=DATE:20270501\nRRULE:FREQ=DAILY;COUNT=2;BYHOUR=9"
+        .parse::<RRuleSet>()
+        .unwrap();
+    assert_eq!(
+        set.to_string(),
+        "DTSTART;VALUE=DATE:20270501\nRRULE:FREQ=DAILY;COUNT=2;BYHOUR=9"
+    );
+}
+
+#[test]
+fn a_date_time_start_at_midnight_is_still_written_back_as_a_date_time() {
+    let set = "DTSTART:20270501T000000\nRRULE:FREQ=DAILY;COUNT=2"
+        .parse::<RRuleSet>()
+        .unwrap();
+    assert_eq!(
+        set.to_string(),
+        "DTSTART:20270501T000000\nRRULE:FREQ=DAILY;COUNT=2;BYHOUR=0;BYMINUTE=0;BYSECOND=0"
+    );
+}

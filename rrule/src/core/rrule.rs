@@ -632,13 +632,29 @@ impl<S> Display for RRule<S> {
     /// When you call this function on [`RRule<Unvalidated>`], it can generate an invalid string, like 'FREQ=YEARLY;INTERVAL=-1'
     /// But it is supposed to always generate a valid string on [`RRule<Validated>`].
     /// So if you want a valid string, it's smarter to always use `rrule.validate(ds_start)?.to_string()`.
-    #[allow(clippy::too_many_lines)]
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.to_ical(false))
+    }
+}
+
+impl<S> RRule<S> {
+    /// The rule's iCalendar text. With `date_start`, for a set whose DTSTART is a DATE,
+    /// UNTIL is written as a DATE and a BYHOUR, BYMINUTE or BYSECOND of only 0 is left
+    /// out: it is what validation fills in from a midnight DTSTART, and RFC 5545 forbids
+    /// those parts beside a DATE.
+    #[allow(clippy::too_many_lines)]
+    pub(crate) fn to_ical(&self, date_start: bool) -> String {
+        let midnight_default = |part: &[u8]| date_start && part == [0];
         let mut res = Vec::with_capacity(15);
         res.push(format!("FREQ={}", &self.freq));
 
         if let Some(until) = &self.until {
-            res.push(format!("UNTIL={}", datetime_to_ical_value(until)));
+            let until = if date_start {
+                until.date().strftime("%Y%m%d").to_string()
+            } else {
+                datetime_to_ical_value(until)
+            };
+            res.push(format!("UNTIL={until}"));
         }
 
         if let Some(count) = &self.count {
@@ -699,7 +715,7 @@ impl<S> Display for RRule<S> {
             ));
         }
 
-        if !self.by_hour.is_empty() {
+        if !self.by_hour.is_empty() && !midnight_default(&self.by_hour) {
             res.push(format!(
                 "BYHOUR={}",
                 self.by_hour
@@ -710,7 +726,7 @@ impl<S> Display for RRule<S> {
             ));
         }
 
-        if !self.by_minute.is_empty() {
+        if !self.by_minute.is_empty() && !midnight_default(&self.by_minute) {
             res.push(format!(
                 "BYMINUTE={}",
                 self.by_minute
@@ -721,7 +737,7 @@ impl<S> Display for RRule<S> {
             ));
         }
 
-        if !self.by_second.is_empty() {
+        if !self.by_second.is_empty() && !midnight_default(&self.by_second) {
             res.push(format!(
                 "BYSECOND={}",
                 self.by_second
@@ -759,7 +775,7 @@ impl<S> Display for RRule<S> {
             res.push(format!("BYEASTER={}", by_easter));
         }
 
-        write!(f, "{}", res.join(";"))
+        res.join(";")
     }
 }
 
