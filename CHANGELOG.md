@@ -14,8 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   BYMONTHDAY without BYMONTH as DTSTART's month only, as Google Calendar does,
   instead of every month (RFC 5545, python-dateutil). Off by default; the rule is
   written back unchanged.
-- `RRuleSet::google_compat()` turns on both, to expand as Google Calendar does
-  (except its 730-instance cap).
+- `RRuleSet::date_start_ignores_time_parts(true)` makes DAILY and coarser rules
+  ignore BYHOUR, BYMINUTE and BYSECOND when DTSTART was parsed as a DATE, as
+  Google Calendar does; RFC 5545 forbids them there. Off by default.
+- `RRuleSet::google_compat()` turns on all three, to expand as Google Calendar
+  does (except its 730-instance cap).
 - A BYDAY value containing a non-ASCII character is a parse error; it used to
   panic (`byte index is not a char boundary`).
 - A BYDAY ordinal that is not an integer (`-.MO`, `1MOL1TU`, `33331TU`) is a

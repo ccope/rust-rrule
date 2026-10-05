@@ -171,3 +171,69 @@ fn google_compat_turns_on_both_readings() {
         ],
     );
 }
+
+// RFC 5545 forbids BYHOUR, BYMINUTE and BYSECOND with a DATE DTSTART; Google ignores them.
+const DATE_START_BYHOUR: &str = "DTSTART;VALUE=DATE:20270501\nRRULE:FREQ=DAILY;BYHOUR=9;COUNT=2";
+
+fn hours(dates: &[jiff::Zoned]) -> Vec<(jiff::civil::Date, i8)> {
+    dates.iter().map(|z| (z.date(), z.hour())).collect()
+}
+
+#[test]
+fn time_parts_on_a_date_start_apply_by_default() {
+    let dates = DATE_START_BYHOUR.parse::<RRuleSet>().unwrap().all(10).dates;
+    assert_eq!(
+        hours(&dates),
+        [
+            (jiff::civil::date(2027, 5, 1), 9),
+            (jiff::civil::date(2027, 5, 2), 9)
+        ]
+    );
+}
+
+#[test]
+fn date_start_ignores_time_parts_keeps_occurrences_at_midnight() {
+    let dates = DATE_START_BYHOUR
+        .parse::<RRuleSet>()
+        .unwrap()
+        .date_start_ignores_time_parts(true)
+        .all(10)
+        .dates;
+    assert_eq!(
+        hours(&dates),
+        [
+            (jiff::civil::date(2027, 5, 1), 0),
+            (jiff::civil::date(2027, 5, 2), 0)
+        ]
+    );
+}
+
+#[test]
+fn date_start_ignores_time_parts_leaves_a_date_time_start_alone() {
+    let dates = "DTSTART:20270501T000000Z\nRRULE:FREQ=DAILY;BYHOUR=9;COUNT=1"
+        .parse::<RRuleSet>()
+        .unwrap()
+        .date_start_ignores_time_parts(true)
+        .all(10)
+        .dates;
+    common::check_occurrences(&dates, &["2027-05-01T09:00:00+00:00"]);
+}
+
+// With BYHOUR applied, the rule's 09:00 and the implicit DTSTART at midnight were
+// two instances on the first day.
+#[test]
+fn google_compat_gives_a_date_start_with_byhour_one_instance_a_day() {
+    let dates = DATE_START_BYHOUR
+        .parse::<RRuleSet>()
+        .unwrap()
+        .google_compat()
+        .all(10)
+        .dates;
+    assert_eq!(
+        hours(&dates),
+        [
+            (jiff::civil::date(2027, 5, 1), 0),
+            (jiff::civil::date(2027, 5, 2), 0)
+        ]
+    );
+}

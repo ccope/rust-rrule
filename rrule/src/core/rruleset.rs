@@ -36,6 +36,10 @@ pub struct RRuleSet {
     pub(crate) dtstart_always_occurs: bool,
     /// Whether a YEARLY rule's BYMONTHDAY without BYMONTH keeps to DTSTART's month.
     pub(crate) yearly_bymonthday_uses_dtstart_month: bool,
+    /// Whether DTSTART was parsed as a DATE (`VALUE=DATE`).
+    pub(crate) dt_start_is_date: bool,
+    /// Whether a DATE DTSTART's rules ignore BYHOUR, BYMINUTE and BYSECOND.
+    pub(crate) date_start_ignores_time_parts: bool,
 }
 
 /// The return result of `RRuleSet::all`.
@@ -64,6 +68,8 @@ impl RRuleSet {
             iteration_limit: DEFAULT_ITERATION_LIMIT,
             dtstart_always_occurs: false,
             yearly_bymonthday_uses_dtstart_month: false,
+            dt_start_is_date: false,
+            date_start_ignores_time_parts: false,
         }
     }
 
@@ -115,8 +121,22 @@ impl RRuleSet {
         self
     }
 
-    /// Expand as Google Calendar does: [`RRuleSet::dtstart_always_occurs`] and
-    /// [`RRuleSet::yearly_bymonthday_uses_dtstart_month`] both on.
+    /// Ignore BYHOUR, BYMINUTE and BYSECOND in DAILY and coarser rules when DTSTART was
+    /// parsed as a DATE, so every occurrence is at midnight.
+    ///
+    /// RFC 5545 forbids those parts with a DATE DTSTART; by default the crate applies them,
+    /// as python-dateutil does, and Google Calendar ignores them. Only a DTSTART parsed
+    /// with `VALUE=DATE` (or as a bare date) counts: an [`RRuleSet::new`] start is a
+    /// DATE-TIME. HOURLY and finer rules are left alone.
+    #[must_use]
+    pub fn date_start_ignores_time_parts(mut self, on: bool) -> Self {
+        self.date_start_ignores_time_parts = on;
+        self
+    }
+
+    /// Expand as Google Calendar does: [`RRuleSet::dtstart_always_occurs`],
+    /// [`RRuleSet::yearly_bymonthday_uses_dtstart_month`] and
+    /// [`RRuleSet::date_start_ignores_time_parts`] all on.
     ///
     /// Google also stops a series at its 730th instance, counted from DTSTART; this does
     /// not, so a caller that needs that bound applies it, for example with `all(730)`.
@@ -124,6 +144,7 @@ impl RRuleSet {
     pub fn google_compat(self) -> Self {
         self.dtstart_always_occurs(true)
             .yearly_bymonthday_uses_dtstart_month(true)
+            .date_start_ignores_time_parts(true)
     }
 
     /// Only return recurrences that comes before this `DateTime`.
@@ -314,6 +335,7 @@ impl RRuleSet {
 
         if let Some(dtstart) = start {
             self.dt_start = dtstart.datetime;
+            self.dt_start_is_date = dtstart.value == "DATE";
         }
 
         self.set_from_content_lines(content_lines)
@@ -336,7 +358,9 @@ impl FromStr for RRuleSet {
 
         let start = start.ok_or(ParseError::MissingStartDate)?;
 
-        Self::new(start.datetime).set_from_content_lines(content_lines)
+        let mut set = Self::new(start.datetime);
+        set.dt_start_is_date = start.value == "DATE";
+        set.set_from_content_lines(content_lines)
     }
 }
 

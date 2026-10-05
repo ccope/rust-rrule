@@ -39,12 +39,15 @@ If you notice that the implementation differs from the specifications above, ple
 
 Where RFC 5545 is silent or Google Calendar departs from it, the crate follows
 python-dateutil by default. `RRuleSet::google_compat()` expands as Google does
-instead, turning on both of:
+instead, turning on all of:
 
 - `dtstart_always_occurs(true)`: a DTSTART the rule does not generate is still
   the first occurrence, outside COUNT, and an EXDATE can remove it.
 - `yearly_bymonthday_uses_dtstart_month(true)`: a YEARLY rule with BYMONTHDAY
   but no BYMONTH keeps to DTSTART's month, instead of repeating in every month.
+- `date_start_ignores_time_parts(true)`: with a DATE DTSTART (an all-day
+  series), DAILY and coarser rules ignore BYHOUR, BYMINUTE and BYSECOND, which
+  RFC 5545 forbids there, so every occurrence stays at midnight.
 
 Google also stops a series at its 730th instance, counted from DTSTART, which
 `google_compat` does not do; `all(730)` gives the same bound. `tests/google.rs`

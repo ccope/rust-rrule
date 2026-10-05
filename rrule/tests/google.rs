@@ -17,11 +17,6 @@ const GOOGLE_CAP: usize = 730;
 /// with Google, and why.
 const KNOWN: &[(&str, &str)] = &[
     (
-        "allday-daily-byhour",
-        "BYHOUR on a DATE DTSTART, which RFC 5545 forbids: Google ignores BYHOUR, the crate \
-         generates 09:00, so the implicit DTSTART at midnight is a second instance that day",
-    ),
-    (
         "cap-daily-2019-window-2026",
         "Google's 730-instance cap: nothing after the series' 730th instance, in any window",
     ),

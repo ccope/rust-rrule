@@ -2,10 +2,11 @@ use jiff::Zoned;
 
 use super::rrule_iter::RRuleIter;
 use super::rrule_iter::WasLimited;
-use crate::core::get_month;
+use crate::core::{get_hour, get_minute, get_month, get_second};
 use crate::RRuleError;
 use crate::RRuleSet;
 use crate::{Frequency, RRule};
+use std::borrow::Cow;
 use std::collections::BTreeSet;
 use std::str::FromStr;
 use std::{collections::HashMap, iter::Iterator};
@@ -231,14 +232,7 @@ impl IntoIterator for &RRuleSet {
             .sort_by(|d1, d2| d2.partial_cmp(d1).expect("Could not order dates correctly"));
 
         let step_limit = self.limited.then_some(self.iteration_limit);
-        let iter = |rule: &RRule| {
-            if self.yearly_bymonthday_uses_dtstart_month {
-                if let Some(pinned) = pin_month_to_dtstart(rule, &self.dt_start) {
-                    return pinned.iter_with_ctx(&self.dt_start, step_limit);
-                }
-            }
-            rule.iter_with_ctx(&self.dt_start, step_limit)
-        };
+        let iter = |rule: &RRule| reading(self, rule).iter_with_ctx(&self.dt_start, step_limit);
 
         RRuleSetIter {
             queue: HashMap::new(),
@@ -257,19 +251,28 @@ impl IntoIterator for &RRuleSet {
     }
 }
 
-/// The rule with DTSTART's month as its BYMONTH, if it is a YEARLY rule whose
-/// BYMONTHDAY Google reads that way; see [`RRuleSet::yearly_bymonthday_uses_dtstart_month`].
-fn pin_month_to_dtstart(rule: &RRule, dt_start: &Zoned) -> Option<RRule> {
-    let pins = rule.freq == Frequency::Yearly
+/// The rule as the set's readings have it iterated; the stored rule, and so what
+/// the set writes back, is unchanged.
+fn reading<'a>(set: &RRuleSet, rule: &'a RRule) -> Cow<'a, RRule> {
+    let mut rule = Cow::Borrowed(rule);
+    // See RRuleSet::yearly_bymonthday_uses_dtstart_month.
+    if set.yearly_bymonthday_uses_dtstart_month
+        && rule.freq == Frequency::Yearly
         && rule.by_month.is_empty()
         && (!rule.by_month_day.is_empty() || !rule.by_n_month_day.is_empty())
         && rule.by_week_no.is_empty()
-        && rule.by_year_day.is_empty();
-    pins.then(|| {
-        let mut pinned = rule.clone();
-        pinned.by_month = vec![get_month(dt_start)];
-        pinned
-    })
+        && rule.by_year_day.is_empty()
+    {
+        rule.to_mut().by_month = vec![get_month(&set.dt_start)];
+    }
+    // See RRuleSet::date_start_ignores_time_parts.
+    if set.date_start_ignores_time_parts && set.dt_start_is_date && rule.freq < Frequency::Hourly {
+        let rule = rule.to_mut();
+        rule.by_hour = vec![get_hour(&set.dt_start)];
+        rule.by_minute = vec![get_minute(&set.dt_start)];
+        rule.by_second = vec![get_second(&set.dt_start)];
+    }
+    rule
 }
 
 impl WasLimited for RRuleSetIter {
