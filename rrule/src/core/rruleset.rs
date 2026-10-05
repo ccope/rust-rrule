@@ -115,6 +115,17 @@ impl RRuleSet {
         self
     }
 
+    /// Expand as Google Calendar does: [`RRuleSet::dtstart_always_occurs`] and
+    /// [`RRuleSet::yearly_bymonthday_uses_dtstart_month`] both on.
+    ///
+    /// Google also stops a series at its 730th instance, counted from DTSTART; this does
+    /// not, so a caller that needs that bound applies it, for example with `all(730)`.
+    #[must_use]
+    pub fn google_compat(self) -> Self {
+        self.dtstart_always_occurs(true)
+            .yearly_bymonthday_uses_dtstart_month(true)
+    }
+
     /// Only return recurrences that comes before this `DateTime`.
     ///
     /// This value will not be used if you use the `Iterator` API directly.

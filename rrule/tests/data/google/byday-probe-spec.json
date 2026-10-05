@@ -1,0 +1,90 @@
+{
+  "comment": "Probes for whether Google pins YEARLY;BYMONTHDAY to DTSTART's month when BYDAY or a negative day is also given (rust-rrule 5-gcal-compat).",
+  "series": [
+    {
+      "name": "probe-yearly-bymonthday-byday",
+      "note": "Friday the 13th: every month's, or August's only?",
+      "start": {
+        "dateTime": "2027-08-13T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-08-13T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=YEARLY;BYMONTHDAY=13;BYDAY=FR;COUNT=6"
+      ],
+      "time_min": "2027-08-12T00:00:00Z",
+      "time_max": "2033-01-01T00:00:00Z"
+    },
+    {
+      "name": "probe-yearly-bymonthday-byday-mo",
+      "note": "1st that is a Monday: every month's, or February's only?",
+      "start": {
+        "dateTime": "2027-02-01T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-02-01T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=YEARLY;BYMONTHDAY=1;BYDAY=MO;COUNT=4"
+      ],
+      "time_min": "2027-01-31T00:00:00Z",
+      "time_max": "2033-01-01T00:00:00Z"
+    },
+    {
+      "name": "probe-yearly-negative-bymonthday",
+      "note": "BYMONTHDAY=-1: last day of every month, or March's only?",
+      "start": {
+        "dateTime": "2027-03-31T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-03-31T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=YEARLY;BYMONTHDAY=-1;COUNT=4"
+      ],
+      "time_min": "2027-03-30T00:00:00Z",
+      "time_max": "2033-01-01T00:00:00Z"
+    },
+    {
+      "name": "probe-yearly-byday-only",
+      "note": "Plain BYDAY=MO: every Monday of the year, or January's only?",
+      "start": {
+        "dateTime": "2027-01-04T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-01-04T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=YEARLY;BYDAY=MO;COUNT=8"
+      ],
+      "time_min": "2027-01-03T00:00:00Z",
+      "time_max": "2033-01-01T00:00:00Z"
+    },
+    {
+      "name": "probe-yearly-bymonthday-interval",
+      "note": "BYMONTHDAY=15 with INTERVAL=2: pinned month every other year?",
+      "start": {
+        "dateTime": "2027-02-15T09:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "end": {
+        "dateTime": "2027-02-15T10:00:00",
+        "timeZone": "America/Los_Angeles"
+      },
+      "recurrence": [
+        "RRULE:FREQ=YEARLY;INTERVAL=2;BYMONTHDAY=15;COUNT=3"
+      ],
+      "time_min": "2027-02-14T00:00:00Z",
+      "time_max": "2033-01-01T00:00:00Z"
+    }
+  ]
+}

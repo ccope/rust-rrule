@@ -35,6 +35,21 @@ But "EXRULE" works exactly the same als "RRULE" except that it excludes dates. Y
 
 If you notice that the implementation differs from the specifications above, please open an issue.
 
+### Google Calendar
+
+Where RFC 5545 is silent or Google Calendar departs from it, the crate follows
+python-dateutil by default. `RRuleSet::google_compat()` expands as Google does
+instead, turning on both of:
+
+- `dtstart_always_occurs(true)`: a DTSTART the rule does not generate is still
+  the first occurrence, outside COUNT, and an EXDATE can remove it.
+- `yearly_bymonthday_uses_dtstart_month(true)`: a YEARLY rule with BYMONTHDAY
+  but no BYMONTH keeps to DTSTART's month, instead of repeating in every month.
+
+Google also stops a series at its 730th instance, counted from DTSTART, which
+`google_compat` does not do; `all(730)` gives the same bound. `tests/google.rs`
+checks expansion against instances recorded from Google Calendar.
+
 ## Library Usage
 
 ```rust

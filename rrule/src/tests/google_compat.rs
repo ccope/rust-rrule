@@ -152,3 +152,22 @@ fn yearly_bymonthday_uses_dtstart_month_without_writing_bymonth() {
         .yearly_bymonthday_uses_dtstart_month(true);
     assert!(!set.to_string().contains("BYMONTH="), "{set}");
 }
+
+// DTSTART 10 February is off-rule, and the 15th stays in February.
+#[test]
+fn google_compat_turns_on_both_readings() {
+    let dates = "DTSTART:20270210T090000Z\nRRULE:FREQ=YEARLY;BYMONTHDAY=15;COUNT=2"
+        .parse::<RRuleSet>()
+        .unwrap()
+        .google_compat()
+        .all(10)
+        .dates;
+    common::check_occurrences(
+        &dates,
+        &[
+            "2027-02-10T09:00:00+00:00",
+            "2027-02-15T09:00:00+00:00",
+            "2028-02-15T09:00:00+00:00",
+        ],
+    );
+}

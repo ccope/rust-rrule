@@ -5,42 +5,21 @@
 //! Google echoed back, expanded over the captured window, and compared with the
 //! slot (`originalStartTime`) of every instance Google listed, cancelled ones
 //! included: a cancellation is an exception to the series, not part of the rule.
+//! The set is expanded with [`RRuleSet::google_compat`], the readings Google uses
+//! where RFC 5545 and python-dateutil differ.
 use rrule::{RRuleSet, TimeZone, Zoned};
 use serde_json::Value;
 
 /// Google's expansion limit for a single series.
 const GOOGLE_CAP: usize = 730;
 
-/// Series where the crate is known to disagree with Google, and why.
+/// Series where the crate, with [`RRuleSet::google_compat`], is known to disagree
+/// with Google, and why.
 const KNOWN: &[(&str, &str)] = &[
     (
-        "la-dtstart-not-in-byday",
-        "Google adds a DTSTART the rule does not generate as an extra instance, outside COUNT; \
-         the crate follows dateutil and drops it",
-    ),
-    (
-        "probe-dtstart-offrule-until",
-        "off-rule DTSTART, as la-dtstart-not-in-byday",
-    ),
-    (
-        "probe-dtstart-offrule-count1",
-        "off-rule DTSTART, as la-dtstart-not-in-byday",
-    ),
-    (
-        "probe-dtstart-offrule-monthly",
-        "off-rule DTSTART, as la-dtstart-not-in-byday",
-    ),
-    (
-        "probe-yearly-nth-byday-no-bymonth",
-        "off-rule DTSTART, as la-dtstart-not-in-byday",
-    ),
-    (
-        "probe-yearly-bymonthday-dtstart-other-day",
-        "off-rule DTSTART plus BYMONTH from DTSTART",
-    ),
-    (
-        "probe-yearly-bymonthday-list",
-        "BYMONTH from DTSTART, as la-yearly-bymonthday-no-bymonth",
+        "allday-daily-byhour",
+        "BYHOUR on a DATE DTSTART, which RFC 5545 forbids: Google ignores BYHOUR, the crate \
+         generates 09:00, so the implicit DTSTART at midnight is a second instance that day",
     ),
     (
         "cap-daily-2019-window-2026",
@@ -49,12 +28,6 @@ const KNOWN: &[(&str, &str)] = &[
     (
         "cap-daily-2019-window-at-730",
         "Google's 730-instance cap: the window straddles the 730th instance",
-    ),
-    ("real-018", "off-rule DTSTART, as la-dtstart-not-in-byday"),
-    (
-        "la-yearly-bymonthday-no-bymonth",
-        "Google takes a missing BYMONTH from DTSTART (RFC 5545: parts the rule omits come from \
-         DTSTART); the crate follows dateutil and repeats BYMONTHDAY in every month",
     ),
 ];
 
@@ -108,7 +81,10 @@ fn expand(series: &Value) -> Result<Vec<String>, String> {
         text.push('\n');
         text.push_str(line.as_str().unwrap_or_default());
     }
-    let set: RRuleSet = text.parse().map_err(|e| format!("{e}: {text}"))?;
+    let set = text
+        .parse::<RRuleSet>()
+        .map_err(|e| format!("{e}: {text}"))?
+        .google_compat();
     let time_min: jiff::Timestamp = spec["time_min"]
         .as_str()
         .and_then(|t| t.parse().ok())
@@ -212,6 +188,7 @@ fn google_fixtures() {
         );
     }
     files.sort();
+    let mut unexplained = vec![];
     for f in files {
         let (pass, fail, unexpected) = run(&f);
         println!(
@@ -220,5 +197,10 @@ fn google_fixtures() {
             pass + fail,
             unexpected.len()
         );
+        unexplained.extend(unexpected);
     }
+    assert!(
+        unexplained.is_empty(),
+        "differ from Google and not in KNOWN: {unexplained:?}"
+    );
 }
