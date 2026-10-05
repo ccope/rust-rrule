@@ -11,10 +11,10 @@ use super::ValidationError;
 /// Range: `1..=12`
 pub(crate) static MONTH_RANGE: RangeInclusive<u8> = 1..=12;
 
-/// Range of values that a year can be. The upper end stays one year inside jiff's
-/// `9999`, since the iterators also build the following year; years before 1 are
-/// outside what calendars use and what the parser and `Display` round-trip.
-pub(crate) static YEAR_RANGE: RangeInclusive<i32> = 1..=9_998;
+/// Range of values that a year can be: what RFC 5545's four-digit year can write
+/// (§3.3.4). Iteration stops at the end of it, or earlier where jiff cannot
+/// represent an instant (after 9999-12-30T22:00Z).
+pub(crate) static YEAR_RANGE: RangeInclusive<i32> = 0..=9_999;
 
 type Validator = &'static dyn Fn(&RRule<Unvalidated>, &Zoned) -> Result<(), ValidationError>;
 

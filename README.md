@@ -73,8 +73,9 @@ You should read the [security docs](https://github.com/fmeringdal/rust-rrule/blo
 ## Limitation and limits
 
 Dates are [Jiff][jiff] `Zoned` values, whose years run -9999..=9999. A rule's
-DTSTART must be in years 1..=9998: the iterators also look at the following
-year, and years before 1 are outside what calendars use.
+DTSTART must be in years 0..=9999, the years RFC 5545's four-digit year can
+write. Iteration stops at the end of 9999, or at Jiff's last instant
+(9999-12-30T22:00Z) where that comes first.
 
 Time zones come from the IANA database as Jiff finds it: the system copy where
 there is one, or a bundled copy on platforms without one. A `TZID` using a
@@ -92,7 +93,7 @@ using the `Iterator` api directly.
 Limitations:
 | Description | Arbitrary Limit | Crate Limit |
 |----------------------------------|-----------------------|-----------------------------|
-| Year range | 1..=9_998 | 1..=9_998 |
+| Year range | 0..=9_999 | 0..=9_999 |
 | Max interval with freq Yearly | 10_000 (10000 years) | 65_535 (u16::MAX) |
 | Max interval with freq Monthly | 1_000 (~83 years) | 65_535 (u16::MAX) |
 | Max interval with freq Weekly | 1_000 (~19 years) | 65_535 (u16::MAX) |

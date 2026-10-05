@@ -21,9 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `RRuleResult::limited` is true when a rule stopped at the iteration guard. The
   rule's iterator recorded it, but the set iterator `all` reads from did not pass
   it on, so a truncated result was reported as complete.
-- A rule's DTSTART must be in years 1..=9998; earlier years fail validation.
-  Years before 1 were accepted but written back as `DTSTART:-6398...`, which
-  does not parse.
+- A rule's DTSTART must be in years 0..=9999, the years RFC 5545's four-digit
+  year can write; others fail validation. Negative years were accepted but
+  written back as `DTSTART:-6398...`, which does not parse. Iteration ends with
+  year 9999, or at Jiff's last instant (9999-12-30T22:00Z), so a DTSTART on
+  9999-12-31 itself is a parse error.
 - A DTSTART whose year is outside the supported range fails validation, and iterating
   a rule from such a DTSTART (possible by pairing an `RRule` validated against
   one start with an `RRuleSet` built on another) yields nothing instead of

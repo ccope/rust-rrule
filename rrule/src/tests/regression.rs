@@ -81,12 +81,40 @@ fn byday_with_multibyte_characters_is_a_parse_error() {
     }
 }
 
-// Jiff's last instant is 9999-12-30T22:00Z; a weekly iterator starting late in 9999
-// builds dates past it and must stop rather than panic.
+// RFC 5545 writes a year as four digits, so 9999 is the last one a DTSTART can have.
+// Jiff's last instant is 9999-12-30T22:00Z: a weekly rule from late in 9999 runs
+// out of representable dates and must stop rather than panic.
 #[test]
-fn dtstart_at_the_end_of_the_year_range_is_rejected() {
-    let text = "DTSTART:99991225T000000Z\nRRULE:FREQ=WEEKLY;COUNT=3";
-    assert!(text.parse::<RRuleSet>().is_err());
+fn dtstart_late_in_year_9999_iterates_to_the_end_of_the_range() {
+    let set = "DTSTART:99991225T000000Z\nRRULE:FREQ=WEEKLY;COUNT=3"
+        .parse::<RRuleSet>()
+        .unwrap();
+    common::check_occurrences(&set.clone().all(10).dates, &["9999-12-25T00:00:00+00:00"]);
+    assert_eq!(
+        set.to_string(),
+        "DTSTART:99991225T000000Z\nRRULE:FREQ=WEEKLY;COUNT=3;BYHOUR=0;BYMINUTE=0;BYSECOND=0;BYDAY=SA"
+    );
+}
+
+#[test]
+fn rules_from_the_last_days_of_year_9999_do_not_panic() {
+    for rule in [
+        "FREQ=DAILY;COUNT=5",
+        "FREQ=HOURLY;COUNT=50",
+        "FREQ=YEARLY;BYWEEKNO=1,53;COUNT=3",
+        "FREQ=MONTHLY;BYMONTHDAY=-1;COUNT=3",
+        "FREQ=YEARLY;BYYEARDAY=-1,366;COUNT=3",
+    ] {
+        for start in ["DTSTART:99991230T000000Z", "DTSTART;VALUE=DATE:99991230"] {
+            let set = format!("{start}\nRRULE:{rule}")
+                .parse::<RRuleSet>()
+                .unwrap();
+            assert!(
+                set.all(100).dates.iter().all(|d| d.year() == 9999),
+                "{start} {rule}"
+            );
+        }
+    }
 }
 
 #[test]
@@ -157,15 +185,39 @@ fn until_ends_iteration_even_when_nothing_matches() {
     assert!(elapsed.as_millis() < 250, "took {elapsed:?}");
 }
 
+// 9999-12-31 is inside the year range but past jiff's last instant, so it is a
+// parse error rather than a start.
 #[test]
-fn dtstart_before_year_1_is_rejected() {
-    let rule = "RRULE:FREQ=YEARLY;COUNT=2";
-    assert!(format!("DTSTART:00001231T000000Z\n{rule}")
-        .parse::<RRuleSet>()
-        .is_err());
-    assert!(format!("DTSTART:00010101T000000Z\n{rule}")
-        .parse::<RRuleSet>()
-        .is_ok());
+fn dtstart_past_the_last_representable_instant_is_a_parse_error() {
+    for start in ["DTSTART;VALUE=DATE:99991231", "DTSTART:99991231T000000Z"] {
+        assert!(format!("{start}\nRRULE:FREQ=DAILY")
+            .parse::<RRuleSet>()
+            .is_err());
+    }
+}
+
+// Year 0000 is the first RFC 5545's four digits can write; earlier years have no
+// iCalendar form, so a DTSTART built in code must not be one.
+#[test]
+fn dtstart_in_year_0_is_accepted_and_written_back() {
+    let text = "DTSTART:00001231T000000Z\nRRULE:FREQ=YEARLY;COUNT=2";
+    let set = text.parse::<RRuleSet>().unwrap();
+    common::check_occurrences(
+        &set.clone().all(10).dates,
+        &["0000-12-31T00:00:00+00:00", "0001-12-31T00:00:00+00:00"],
+    );
+    assert_eq!(
+        set.to_string().parse::<RRuleSet>().unwrap().all(10).dates,
+        set.all(10).dates
+    );
+}
+
+#[test]
+fn dtstart_before_year_0_is_rejected() {
+    let start = jiff::civil::date(-1, 12, 31)
+        .to_zoned(jiff::tz::TimeZone::UTC)
+        .unwrap();
+    assert!(RRule::new(Frequency::Yearly).count(2).build(start).is_err());
 }
 
 // Monday 29 February: after 2016 the next one is 2044-02-29, 10,226 daily steps out.
