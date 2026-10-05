@@ -2,8 +2,10 @@ use jiff::Zoned;
 
 use super::rrule_iter::RRuleIter;
 use super::rrule_iter::WasLimited;
+use crate::core::get_month;
 use crate::RRuleError;
 use crate::RRuleSet;
+use crate::{Frequency, RRule};
 use std::collections::BTreeSet;
 use std::str::FromStr;
 use std::{collections::HashMap, iter::Iterator};
@@ -229,21 +231,21 @@ impl IntoIterator for &RRuleSet {
             .sort_by(|d1, d2| d2.partial_cmp(d1).expect("Could not order dates correctly"));
 
         let step_limit = self.limited.then_some(self.iteration_limit);
+        let iter = |rule: &RRule| {
+            if self.yearly_bymonthday_uses_dtstart_month {
+                if let Some(pinned) = pin_month_to_dtstart(rule, &self.dt_start) {
+                    return pinned.iter_with_ctx(&self.dt_start, step_limit);
+                }
+            }
+            rule.iter_with_ctx(&self.dt_start, step_limit)
+        };
 
         RRuleSetIter {
             queue: HashMap::new(),
             step_limit,
-            rrule_iters: self
-                .rrule
-                .iter()
-                .map(|rrule| rrule.iter_with_ctx(&self.dt_start, step_limit))
-                .collect(),
+            rrule_iters: self.rrule.iter().map(iter).collect(),
             rdates: rdates_sorted,
-            exrules: self
-                .exrule
-                .iter()
-                .map(|exrule| exrule.iter_with_ctx(&self.dt_start, step_limit))
-                .collect(),
+            exrules: self.exrule.iter().map(iter).collect(),
             exdates: self
                 .exdate
                 .iter()
@@ -253,6 +255,21 @@ impl IntoIterator for &RRuleSet {
             last: None,
         }
     }
+}
+
+/// The rule with DTSTART's month as its BYMONTH, if it is a YEARLY rule whose
+/// BYMONTHDAY Google reads that way; see [`RRuleSet::yearly_bymonthday_uses_dtstart_month`].
+fn pin_month_to_dtstart(rule: &RRule, dt_start: &Zoned) -> Option<RRule> {
+    let pins = rule.freq == Frequency::Yearly
+        && rule.by_month.is_empty()
+        && (!rule.by_month_day.is_empty() || !rule.by_n_month_day.is_empty())
+        && rule.by_week_no.is_empty()
+        && rule.by_year_day.is_empty();
+    pins.then(|| {
+        let mut pinned = rule.clone();
+        pinned.by_month = vec![get_month(dt_start)];
+        pinned
+    })
 }
 
 impl WasLimited for RRuleSetIter {

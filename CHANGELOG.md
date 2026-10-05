@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   generate an occurrence anyway, as an implicit RDATE outside COUNT that EXDATE
   can remove (RFC 2445, Google Calendar). Off by default, which keeps
   python-dateutil's reading.
+- `RRuleSet::yearly_bymonthday_uses_dtstart_month(true)` reads a YEARLY rule's
+  BYMONTHDAY without BYMONTH as DTSTART's month only, as Google Calendar does,
+  instead of every month (RFC 5545, python-dateutil). Off by default; the rule is
+  written back unchanged.
 - A BYDAY value containing a non-ASCII character is a parse error; it used to
   panic (`byte index is not a char boundary`).
 - A BYDAY ordinal that is not an integer (`-.MO`, `1MOL1TU`, `33331TU`) is a

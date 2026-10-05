@@ -34,6 +34,8 @@ pub struct RRuleSet {
     pub(crate) iteration_limit: u32,
     /// Whether DTSTART is an occurrence even when the rules do not generate it.
     pub(crate) dtstart_always_occurs: bool,
+    /// Whether a YEARLY rule's BYMONTHDAY without BYMONTH keeps to DTSTART's month.
+    pub(crate) yearly_bymonthday_uses_dtstart_month: bool,
 }
 
 /// The return result of `RRuleSet::all`.
@@ -61,6 +63,7 @@ impl RRuleSet {
             limited: false,
             iteration_limit: DEFAULT_ITERATION_LIMIT,
             dtstart_always_occurs: false,
+            yearly_bymonthday_uses_dtstart_month: false,
         }
     }
 
@@ -96,6 +99,19 @@ impl RRuleSet {
     #[must_use]
     pub fn dtstart_always_occurs(mut self, on: bool) -> Self {
         self.dtstart_always_occurs = on;
+        self
+    }
+
+    /// Read a YEARLY rule's BYMONTHDAY, when it has no BYMONTH, as in DTSTART's month only.
+    ///
+    /// RFC 5545 expands BYMONTHDAY across every month of a YEARLY rule, and by default the
+    /// crate does, as python-dateutil does. Google Calendar instead takes the missing
+    /// BYMONTH from DTSTART, also when BYDAY is given or the day is negative; a rule with
+    /// BYWEEKNO or BYYEARDAY is left alone. Only iteration changes: the rule is written
+    /// back as it was given.
+    #[must_use]
+    pub fn yearly_bymonthday_uses_dtstart_month(mut self, on: bool) -> Self {
+        self.yearly_bymonthday_uses_dtstart_month = on;
         self
     }
 
