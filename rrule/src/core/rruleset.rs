@@ -32,6 +32,8 @@ pub struct RRuleSet {
     pub(crate) limited: bool,
     /// Steps without an occurrence before a limited iteration gives up.
     pub(crate) iteration_limit: u32,
+    /// Whether DTSTART is an occurrence even when the rules do not generate it.
+    pub(crate) dtstart_always_occurs: bool,
 }
 
 /// The return result of `RRuleSet::all`.
@@ -58,6 +60,7 @@ impl RRuleSet {
             after: None,
             limited: false,
             iteration_limit: DEFAULT_ITERATION_LIMIT,
+            dtstart_always_occurs: false,
         }
     }
 
@@ -80,6 +83,19 @@ impl RRuleSet {
     pub fn iteration_limit(mut self, steps: u32) -> Self {
         self.limited = true;
         self.iteration_limit = steps;
+        self
+    }
+
+    /// Make DTSTART an occurrence even when the rules do not generate it.
+    ///
+    /// RFC 5545 leaves a set whose DTSTART is not synchronized with its rule undefined,
+    /// and by default the crate follows python-dateutil and omits it. With this on,
+    /// DTSTART behaves as an implicit RDATE, as in RFC 2445 and Google Calendar: it comes
+    /// first, it does not count towards COUNT, and an EXDATE or EXRULE can remove it.
+    /// A DTSTART the rules do generate still occurs once.
+    #[must_use]
+    pub fn dtstart_always_occurs(mut self, on: bool) -> Self {
+        self.dtstart_always_occurs = on;
         self
     }
 

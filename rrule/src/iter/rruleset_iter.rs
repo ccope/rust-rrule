@@ -220,6 +220,11 @@ impl IntoIterator for &RRuleSet {
     fn into_iter(self) -> Self::IntoIter {
         // Sort in decreasing order
         let mut rdates_sorted = self.rdate.clone();
+        // An implicit RDATE goes through EXDATE and EXRULE like any other, and the
+        // iterator's deduplication drops it when a rule generates it too.
+        if self.dtstart_always_occurs {
+            rdates_sorted.push(self.dt_start.clone());
+        }
         rdates_sorted
             .sort_by(|d1, d2| d2.partial_cmp(d1).expect("Could not order dates correctly"));
 

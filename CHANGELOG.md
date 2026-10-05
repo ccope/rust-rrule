@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- `RRuleSet::dtstart_always_occurs(true)` makes a DTSTART the rules do not
+  generate an occurrence anyway, as an implicit RDATE outside COUNT that EXDATE
+  can remove (RFC 2445, Google Calendar). Off by default, which keeps
+  python-dateutil's reading.
 - A BYDAY value containing a non-ASCII character is a parse error; it used to
   panic (`byte index is not a char boundary`).
 - A BYDAY ordinal that is not an integer (`-.MO`, `1MOL1TU`, `33331TU`) is a
