@@ -122,6 +122,15 @@ fn run(path: &std::path::Path) -> (usize, usize, Vec<String>) {
             println!("SKIP {name}: Google rejected it");
             continue;
         }
+        let has_exrule = series["master"]["recurrence"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .any(|l| l.as_str().is_some_and(|l| l.starts_with("EXRULE")));
+        if has_exrule && !cfg!(feature = "exrule") {
+            println!("SKIP {name}: needs the exrule feature");
+            continue;
+        }
         let mut google: Vec<String> = series["instances"]
             .as_array()
             .into_iter()
